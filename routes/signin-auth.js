@@ -22,8 +22,6 @@ const user = await User.findOne({email:req.body.email});
 
     const token = jwt.sign({_id: user._id} ,process.env.TOKEN_SECERT);
      res.header('auth-token' , token).send(token);
-    
-    
     res.send('logged in');
 
 });

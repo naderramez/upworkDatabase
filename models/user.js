@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    nationality:{
+    country:{
         type:String,
         required:true,
         min:4
@@ -27,11 +27,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true,
         min:4
-    },
-    date:{
-        type: Date,
-        default: Date.now
     }
-});
+},
+    {timestamps:true}
+);
 
 module.exports = mongoose.model('User',userSchema);

@@ -21,7 +21,7 @@ const hashPassword = await bcrypt.hash(req.body.password, salt);
         lastName:req.body.lastName,
         email:req.body.email,
         password:hashPassword , // update reem
-        nationality:req.body.nationality,
+        country:req.body.country,
         type:req.body.type,
     });
     try{

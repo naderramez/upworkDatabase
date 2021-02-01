@@ -1,0 +1,82 @@
+const mongoose = require('mongoose');
+const jobSchema = new mongoose.Schema({
+    postName:{
+        type:String,
+        required: true
+    },
+    category:{
+        type:String,
+        required:true,
+    },
+    description:{
+        type:String,
+        required:true,
+        min:10
+    },
+    additionalFiles:{
+        type:Array,
+        required:false
+    },
+    projectType:{
+        type:String,
+    },
+    screaningQuestions:{
+        type:Array,
+        required:true
+    },
+    coverLetter:{
+        type:Boolean,
+    },
+    skills:{
+        type:Array,
+        required:true,
+    },
+    experienceLevel:{
+        type:String,
+        required:true,
+    },
+    visibility:{
+        type: String,
+    },
+    freelancersNo:{
+        type: Number,
+    },
+    talentPreference:{
+        type:Object,
+        required:false
+    },
+    payType:{
+        type:String,
+    },
+    estimatedBudget:{
+        type:Number
+    },
+    duration:{
+        type:String
+    },
+    timeRequiremnt:{
+        type:String
+    },
+    postStatus:{
+        type:String
+    },
+    likers:{
+        type:Array
+    },
+    dislikers:{
+        type:Array
+    },
+    proposals:{
+        type:Object
+    },
+    hiring:{
+        type:Object
+    },
+    interviews:{
+        type:Object
+    },
+},
+    {timestamps:true}
+);
+
+module.exports = mongoose.model('Job',jobSchema);
