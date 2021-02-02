@@ -30,13 +30,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true,
         min:4
-<<<<<<< HEAD
-    }
-},
-    {timestamps:true}
-);
-=======
-    },
+    } ,
     date:{
         type: Date,
         default: Date.now
@@ -52,9 +46,10 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }]
-    
-})
-
+},
+    {timestamps:true}
+);
+  
 userSchema.virtual('tasks', {
     ref:'profileDetials',
     localField: '_id',
@@ -131,7 +126,6 @@ next()
 //module.export = User
 module.exports = mongoose.model('User',userSchema);
 */
->>>>>>> login
 
 const User = mongoose.model('User', userSchema)
 module.exports = User

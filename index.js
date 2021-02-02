@@ -16,18 +16,13 @@ mongoose.connect(process.env.DB_CONNECTION,
     ()=>console.log("DB Connected Successfully"))
 
 const registerAuthRouter = require('./routes/register-auth');
-<<<<<<< HEAD
-const signinAuthRouter = require('./routes/signin-auth');
-const profileRoute = require('./routes/profile');
+//const signinAuthRouter = require('./routes/signin-auth');
+//const profileRoute = require('./routes/profile');
 const jobRoute = require('./routes/jobs').router;
 
-app.use('/api/user/register',registerAuthRouter);
-app.use('/api/user',signinAuthRouter); //update reem
-app.use('/api/profile' , profileRoute);// update reem
-app.use('/api/job',jobRoute);
 
-app.listen(8080);
-=======
+
+//app.listen(8080);
 //const signinAuthRouter = require('./routes/signin-auth');
 const profile = require('./routes/profile');
 const signin = require('./routes/signin');
@@ -35,7 +30,8 @@ const signin = require('./routes/signin');
 app.use('/api/user/register',registerAuthRouter);
 //app.use('/api/user',signinAuthRouter); //update reem
 app.use('/api/user',signin); 
-app.use('/api/user', profile); 
+app.use('/api/user', profile);
+app.use('/api/job',jobRoute);
 
 app.listen(3000);
 
@@ -86,4 +82,3 @@ const bcrypt = require('bcryptjs')
 
  myFunction()
  */
->>>>>>> login

@@ -22,14 +22,9 @@ router.post('/', async (req, res)=>{
         firstName:req.body.firstName,
         lastName:req.body.lastName,
         email:req.body.email,
-<<<<<<< HEAD
-        password:hashPassword , // update reem
         country:req.body.country,
-=======
         //password:hashPassword , // update reem
         password:req.body.password,
-        nationality:req.body.nationality,
->>>>>>> login
         type:req.body.type,
         description:req.body.description,
         education:req.body.education

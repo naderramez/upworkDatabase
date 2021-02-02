@@ -22,13 +22,10 @@ const user = await User.findOne({email:req.body.email});
 
     const token = jwt.sign({_id: user._id},process.env.TOKEN_SECRET);
      res.header('auth-token' , token).send(token);
-<<<<<<< HEAD
-    res.send('logged in');
-=======
+  
     
     
     //res.send('logged in');
->>>>>>> login
 
 });
 module.exports = router;
