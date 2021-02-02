@@ -70,10 +70,10 @@ res.download(directoryPath + fileName, fileName, (err) => {
 //STORING JOB 
 router.post('/savejob' , async(req , res) =>{
     const job = await new Job({
+        owner:req.body.owner,
         postName:req.body.postName,
         category:req.body.category,
         description:req.body.description,
-        additionalFiles:req.body.additionalFiles,  
         projectType:req.body.projectType,
         screaningQuestions:req.body.screaningQuestions,
         coverLetter:req.body.coverLetter,
@@ -99,6 +99,7 @@ router.post('/savejob' , async(req , res) =>{
 router.post('/saveTitle', async(req , res) =>{
     const jobTitle = await new Job(
       {
+        owner:req.body.owner,
         postName:req.body.postName,
         category:req.body.category,
         postStatus:0
@@ -113,7 +114,7 @@ router.post('/saveTitle', async(req , res) =>{
 })
 router.patch('/saveDescription', async(req , res) =>{
   try{
-    const description = await Job.updateOne({_id:req.body.jobId},{$set:{description:req.body.description,additionalFiles:allFiles}});
+    const description = await Job.updateOne({_id:req.body.jobId},{$set:{description:req.body.description}});
     res.send(description);
   }catch(err){
     res.status(400).send(err)
@@ -145,7 +146,7 @@ router.patch('/saveVisibility', async(req , res) =>{
 })
 router.patch('/saveBudget', async(req , res) =>{
   try{
-    const budget = await Job.updateOne({_id:req.body.jobId},{$set:{estimatedBudget:req.body.estimatedBudget}});
+    const budget = await Job.updateOne({_id:req.body.jobId},{$set:{estimatedBudget:req.body.estimatedBudget, duration: req.body.duration, timeRequiremnt: req.body.timeRequiremnt}});
     res.send(budget);
   }catch(err){
     res.status(400).send(err)
@@ -223,8 +224,15 @@ router.delete('/deleteJob/:jobId' , async(req , res) =>{
 //POST JOB POST LIKE OR DISLIKE
 router.post('/like', async(req , res) =>{
   try {
+<<<<<<< HEAD
     const likers = await Job.find ({_id: req.body.jobId},{likers:1,_id:0}).pretty();
     likers.push(userId);
+=======
+    let likers = [];
+    likers = await Job.find ({_id: req.body.jobId},{likers:1,_id:0});
+    likers = likers[0].likers;
+    likers.push(req.body.userId);
+>>>>>>> 88dca777602bf8ffd3cbfecd3aa695aa2d2b998d
     const updatedJob = await Job.updateOne({_id:req.body.jobId},{$set:{likers:likers}});
     res.json(updatedJob);
   } catch(err){
@@ -237,7 +245,14 @@ router.post('/dislike', async(req , res) =>{
       userId:req.body.userId,
       reason:req.body.reason
     }
+<<<<<<< HEAD
     const dislikers = await Job.find ({_id: req.body.jobId},{dislikers:1,_id:0}).pretty();
+=======
+    let dislikers = [];
+    dislikers = await Job.find ({_id: req.body.jobId},{dislikers:1,_id:0});
+    dislikers = dislikers[0].dislikers;
+    console.log(dislikers)
+>>>>>>> 88dca777602bf8ffd3cbfecd3aa695aa2d2b998d
     dislikers.push(dislikObj);
     const updatedJob = await Job.updateOne({_id:req.body.jobId},{$set:{dislikers:dislikers}});
     res.json(updatedJob);
