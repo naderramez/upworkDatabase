@@ -20,9 +20,15 @@ const user = await User.findOne({email:req.body.email});
     if(!validPass ) return res.status(400).send('invalid password '); 
     // create and sign token
 
-    const token = jwt.sign({_id: user._id} ,process.env.TOKEN_SECERT);
+    const token = jwt.sign({_id: user._id},process.env.TOKEN_SECRET);
      res.header('auth-token' , token).send(token);
+<<<<<<< HEAD
     res.send('logged in');
+=======
+    
+    
+    //res.send('logged in');
+>>>>>>> login
 
 });
 module.exports = router;
