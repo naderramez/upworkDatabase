@@ -11,18 +11,23 @@ router.post('/', async (req, res)=>{
     //TO NOT DUPLICATE DTAT
     const emailExist = await User.findOne({email:req.body.email});
     if(emailExist){return res.status(400).send('Email is already exists');}
+
+    
 // reem hashed password 
-const salt = await bcrypt.genSalt(10);
-const hashPassword = await bcrypt.hash(req.body.password, salt);
+//const salt = await bcrypt.genSalt(10);
+//const hashPassword = await bcrypt.hash(req.body.password, salt);
 
 //reem 
     const user = await new User({
         firstName:req.body.firstName,
         lastName:req.body.lastName,
         email:req.body.email,
-        password:hashPassword , // update reem
+        //password:hashPassword , // update reem
+        password:req.body.password,
         nationality:req.body.nationality,
         type:req.body.type,
+        description:req.body.description,
+        education:req.body.education
     });
     try{
         const savedUser = await user.save();
