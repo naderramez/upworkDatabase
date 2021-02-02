@@ -6,9 +6,10 @@ const multipleUpload = async (req, res) => {
     if (req.files.length <= 0) {
       return res.send(`You must select at least 1 file.`);
     }
+    await Job.updateOne({_id:req.body.jobId},{$set:{additionalFiles:allFiles}});
     console.log(req.files.originalname);
     console.log(allFiles)
-    return res.send(`Files has been uploaded.`);
+    return res.send(allfiles);
   } catch (error) {
     console.log(error);
 
