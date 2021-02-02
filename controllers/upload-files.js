@@ -1,3 +1,4 @@
+const Job = require('../models/job');
 const upload = require("../middleware/upload-files").uploadFilesMiddleware;
 const allFiles = require("../middleware/upload-files").files
 const multipleUpload = async (req, res) => {
