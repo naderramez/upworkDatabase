@@ -1,6 +1,5 @@
 const upload = require("../middleware/upload-files").uploadFilesMiddleware;
 const allFiles = require("../middleware/upload-files").files
-let files = [];
 const multipleUpload = async (req, res) => {
   try {
     await upload(req, res);

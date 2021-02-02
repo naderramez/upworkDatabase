@@ -1,52 +1,43 @@
 const mongoose = require('mongoose');
 const jobSchema = new mongoose.Schema({
     postName:{
-        type:String,
-        required: true
+        type:String
     },
     category:{
-        type:String,
-        required:true,
+        type:String
     },
     description:{
-        type:String,
-        required:true,
-        min:10
+        type:String
     },
     additionalFiles:{
-        type:Array,
-        required:false
+        type:Array
     },
     projectType:{
-        type:String,
+        type:String
     },
     screaningQuestions:{
-        type:Array,
-        required:true
+        type:Array
     },
     coverLetter:{
-        type:Boolean,
+        type:Boolean
     },
     skills:{
-        type:Array,
-        required:true,
+        type:Array
     },
     experienceLevel:{
-        type:String,
-        required:true,
+        type:String
     },
     visibility:{
-        type: String,
+        type: String
     },
     freelancersNo:{
-        type: Number,
+        type: Number
     },
     talentPreference:{
-        type:Object,
-        required:false
+        type:Object
     },
     payType:{
-        type:String,
+        type:String
     },
     estimatedBudget:{
         type:Number
