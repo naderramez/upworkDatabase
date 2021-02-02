@@ -223,10 +223,15 @@ router.delete('/deleteJob/:jobId' , async(req , res) =>{
 //POST JOB POST LIKE OR DISLIKE
 router.post('/like', async(req , res) =>{
   try {
+<<<<<<< HEAD
     let likers = [];
     likers = await Job.find ({_id: req.body.jobId},{likers:1,_id:0});
     likers = likers[0].likers;
     likers.push(req.body.userId);
+=======
+    const likers = await Job.find ({_id: req.body.jobId},{likers:1,_id:0}).pretty();
+    likers.push(userId);
+>>>>>>> b7a1a1be3ef2e69ed5dfc19add875c65a757199a
     const updatedJob = await Job.updateOne({_id:req.body.jobId},{$set:{likers:likers}});
     res.json(updatedJob);
   } catch(err){
@@ -239,10 +244,14 @@ router.post('/dislike', async(req , res) =>{
       userId:req.body.userId,
       reason:req.body.reason
     }
+<<<<<<< HEAD
     let dislikers = [];
     dislikers = await Job.find ({_id: req.body.jobId},{dislikers:1,_id:0});
     dislikers = dislikers[0].dislikers;
     console.log(dislikers)
+=======
+    const dislikers = await Job.find ({_id: req.body.jobId},{dislikers:1,_id:0}).pretty();
+>>>>>>> b7a1a1be3ef2e69ed5dfc19add875c65a757199a
     dislikers.push(dislikObj);
     const updatedJob = await Job.updateOne({_id:req.body.jobId},{$set:{dislikers:dislikers}});
     res.json(updatedJob);
