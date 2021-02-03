@@ -25,9 +25,9 @@ router.post('/', async (req, res)=>{
         country:req.body.country,
         //password:hashPassword , // update reem
         password:req.body.password,
-        type:req.body.type,
-        description:req.body.description,
-        education:req.body.education
+        type:req.body.type
+      //  description:req.body.description,
+        //education:req.body.education
     });
     try{
         const savedUser = await user.save();

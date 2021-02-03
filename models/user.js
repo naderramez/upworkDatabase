@@ -35,20 +35,13 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    description:{
-        type:String,
-        required:true
-    
-    },
     tokens: [{
         token: {
             type: String,
             required: true
         }
     }]
-},
-    {timestamps:true}
-);
+});
   
 userSchema.virtual('tasks', {
     ref:'profileDetials',

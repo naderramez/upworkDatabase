@@ -8,16 +8,12 @@ const registerValidation = (data) => {
         lastName:Joi.string().min(2).required(),
         email:Joi.string().min(4).required().email(),
         password:Joi.string().min(6).required(),
-<<<<<<< HEAD
         country:Joi.string().min(2).required(),
-        type:Joi.required()
-=======
-        nationality:Joi.string().min(6).required(),
         type:Joi.required(),
-        description:Joi.string().required(),
-        education:Joi.string().required(),
+       // type:Joi.required(),
+       // description:Joi.string().required(),
+       // education:Joi.string().required(),
 
->>>>>>> login
     });
     return schema.validate(data)
 
