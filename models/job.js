@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const jobSchema = new mongoose.Schema({
-    owner:{
+    clientId:{
         type: String
     },
     postName:{
@@ -36,23 +36,23 @@ const jobSchema = new mongoose.Schema({
     freelancersNo:{
         type: Number
     },
-    talentPreference:{
-        type:Object
-    },
-    payType:{
-        type:String
-    },
+    // talentPreference:{
+    //     type:Object
+    // },
+    // payType:{
+    //     type:String
+    // },
     estimatedBudget:{
         type:Number
     },
-    duration:{
-        type:String
-    },
-    timeRequiremnt:{
-        type:String
-    },
+    // duration:{
+    //     type:String
+    // },
+    // timeRequiremnt:{
+    //     type:String
+    // },
     postStatus:{
-        type:String
+        type:Number
     },
     likers:{
         type:Array
@@ -66,9 +66,9 @@ const jobSchema = new mongoose.Schema({
     hiring:{
         type:Object
     },
-    interviews:{
-        type:Object
-    },
+    jobFiles:{
+        type:Array
+    }
 },
     {timestamps:true}
 );
