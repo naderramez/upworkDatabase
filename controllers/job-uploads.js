@@ -1,6 +1,6 @@
 const Job = require('../models/job');
-const upload = require("../middleware/upload-files").uploadFilesMiddleware;
-const allFiles = require("../middleware/upload-files").files
+const upload = require("../middleware/job-uploads").uploadFilesMiddleware;
+const allFiles = require("../middleware/job-uploads").files
 const multipleUpload = async (req, res) => {
   try {
     await upload(req, res);
@@ -10,7 +10,7 @@ const multipleUpload = async (req, res) => {
     await Job.updateOne({_id:req.body.jobId},{$set:{additionalFiles:allFiles}});
     console.log(req.files.originalname);
     console.log(allFiles)
-    return res.send(allfiles);
+    return res.send(allFiles);
   } catch (error) {
     console.log(error);
 
