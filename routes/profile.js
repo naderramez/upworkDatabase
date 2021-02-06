@@ -1,8 +1,12 @@
 const profileDetials = require('../models/profileDetials');
+const user = require('../models/user');
 const express = require('express');
 const auth = require('../middleware/auth');
 const router = new express.Router();
-
+const allFiles = require("../middleware/upload-files").files
+const uploadController = require("../controllers/upload-files");
+//uploadfile
+router.post("/multiple-upload", uploadController.multipleUpload);
 
 // add profile description
 router.post('/adddesc' , auth , async (req , res) =>{
@@ -20,7 +24,7 @@ res.status(400).send(e)
 
 })
 
-// get profile  dec
+// get profile WITHOUT ID FOR HOME
 router.get('/getdesc' , (req ,res)  =>{
     profileDetials.find({}).then((desc) =>{
         res.send(desc)
@@ -29,8 +33,8 @@ router.get('/getdesc' , (req ,res)  =>{
      })
 })
  
-
-router.get('/getdesc/:id', async (req, res) => {
+// WITH ID WITHOUT AUTH FOR HOME VIEW PROFILE
+router.get('/getprofiledesc/:id', async (req, res) => {
     const _id = req.params.id
 
     try {
@@ -46,8 +50,42 @@ router.get('/getdesc/:id', async (req, res) => {
     }
 })
 
+// GET FOR PROFILE DESC WITH AUTH
+router.get('/getdesc/:id', auth, async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const task = await profileDetials.findById({ _id, owner: req.user._id })
+
+        if (!task) {
+            return res.status(404).send()
+        }
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 
+//ifo user and profile
+/*
+router.get('/allinfo/:id',auth,async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        //const task = await profileDetials.findById({_id , owner: req.user._ids})
+      // const user = await User.findById({_id, owner: req.user._id })
+        if (!task) {
+            return res.status(404).send()
+        }
+
+        res.send(task,user )
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+*/
 router.patch('/editdesc/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description']
@@ -87,7 +125,8 @@ router.delete('/deletedesc/:id', async (req, res) => {
 })
 //pricepost
 //addprice in database
-router.patch('/addprice/:id' , async(req , res) =>{
+
+router.patch('/addprice/:id' ,auth, async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -99,6 +138,8 @@ router.patch('/addprice/:id' , async(req , res) =>{
     }
     
 })
+
+
 
 //get price
 router.get('/getprice/:id', async (req, res) => {
@@ -157,7 +198,7 @@ router.delete('/deleteprice/:id', async (req, res) => {
 
 // addtitle
 //edit for add
-router.patch('/addtitle/:id' , async(req , res) =>{
+router.patch('/addtitle/:id' ,auth , async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -228,7 +269,7 @@ router.delete('/deletetitle/:id', async (req, res) => {
 // education
 //add edu
 //patch to add and edit
-router.patch('/addedu/:id' , async(req , res) =>{
+router.patch('/addedu/:id' ,auth, async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -298,7 +339,7 @@ router.delete('/delteedu/:id', async (req, res) => {
 
 //language
 
-router.patch('/addlang/:id' , async(req , res) =>{
+router.patch('/addlang/:id' , auth, async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -370,7 +411,7 @@ router.delete('/deletelang/:id', async (req, res) => {
 // skills
 
 
-router.patch('/addskills/:id' , async(req , res) =>{
+router.patch('/addskills/:id' , auth,async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -439,7 +480,7 @@ router.delete('/deleteskills/:id', async (req, res) => {
 })
 //workhistory
 
-router.patch('/addwork/:id' , async(req , res) =>{
+router.patch('/addwork/:id' , auth, async(req , res) =>{
     try{
         const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
         if(!desc){
@@ -507,8 +548,58 @@ router.delete('/deletework/:id', async (req, res) => {
     }
 })
 
+router.get('/users/:id', auth, async (req, res) => {
+    res.send(req.user)
+})
 
 
+
+
+/*
+router.patch('/deleteprice/:id', async (req, res) => {
+    const updates = Object.keys(req.body)
+        const allowedUpdates = ['price']
+        const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    
+        if (!isValidOperation) {
+            return res.status(400).send({ error: 'Invalid updates!' })
+        }
+    
+    
+    try {
+        
+        const updatedProfile= await profileDetials.UpdateOne({​​​​_id:req.params.id}, {​​​​$set:{price:" "}​​​​});
+       
+
+        res.send(updatedProfile)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+/*
+// delet by patch maryem
+router.patch('/deletedesc/:id',auth ,async (req, res) => {
+    const updates = Object.keys(req.body)
+        const allowedUpdates = ['desc']
+        const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    
+        if (!isValidOperation) {
+            return res.status(400).send({ error: 'Invalid updates!' })
+        }
+    
+    
+    try {
+        
+        const updatedProfile= await profileDetials.updateOne({​​​​_id:req.params.id , owner: req.user._id}​​​​,{​​​​$set:{workhistory:""}​​​​}​​​​);
+       
+
+        res.send(updatedProfile)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+*/
 
 /*
 // update profile description
