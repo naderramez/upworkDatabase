@@ -5,30 +5,29 @@ const router = new express.Router();
 
 
 // add profile description
-router.post('/adddesc' , auth , async (req , res) =>{
-const desc = new profileDetials({
+router.post('/adddesc', auth, async (req, res) => {
+    const desc = new profileDetials({
         ...req.body,
-  owner: req.user._id
-})
+        owner: req.user._id
+    })
 
-try {
-await desc.save()
-res.status(201).send(desc)
-} catch (e) {
-res.status(400).send(e)
-}
+    try {
+        await desc.save()
+        res.status(201).send(desc)
+    } catch (e) {
+        res.status(400).send(e)
+    }
 
 })
 
 // get profile  dec
-router.get('/getdesc' , (req ,res)  =>{
-    profileDetials.find({}).then((desc) =>{
+router.get('/getdesc', (req, res) => {
+    profileDetials.find({}).then((desc) => {
         res.send(desc)
-     }).catch((e)=>{
-         res.status(500).send()
-     })
+    }).catch((e) => {
+        res.status(500).send()
+    })
 })
- 
 
 router.get('/getdesc/:id', async (req, res) => {
     const _id = req.params.id
@@ -47,18 +46,22 @@ router.get('/getdesc/:id', async (req, res) => {
 })
 
 
-
 router.patch('/editdesc/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
-        const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
 
         if (!task) {
             return res.status(404).send()
@@ -87,35 +90,41 @@ router.delete('/deletedesc/:id', async (req, res) => {
 })
 //pricepost
 //addprice in database
-router.patch('/addprice/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
-            return res.status(404).send()
-        }
-        return res.send(desc)
+router.patch('/addprice/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        const newData = await profileDetials.updateOne({_id:req.params.id},{
+            $set: {
+              paymentAccount: freelancerAccount
+            },
+          })
+        
+        return res.send(newData)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 //get price
 router.get('/getprice/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
+    const _id = req.params.id
+
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 //edit price
 router.patch('/editprice/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -123,11 +132,16 @@ router.patch('/editprice/:id', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
-        const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
 
         if (!task) {
             return res.status(404).send()
@@ -157,35 +171,38 @@ router.delete('/deleteprice/:id', async (req, res) => {
 
 // addtitle
 //edit for add
-router.patch('/addtitle/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
+router.patch('/addtitle/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!desc) {
             return res.status(404).send()
         }
         return res.send(desc)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 
-    router.get('/gettitle/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
+router.get('/gettitle/:id', async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 router.patch('/edittitle/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -193,11 +210,16 @@ router.patch('/edittitle/:id', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
-        const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
 
         if (!task) {
             return res.status(404).send()
@@ -228,35 +250,38 @@ router.delete('/deletetitle/:id', async (req, res) => {
 // education
 //add edu
 //patch to add and edit
-router.patch('/addedu/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
+router.patch('/addedu/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!desc) {
             return res.status(404).send()
         }
         return res.send(desc)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 
-    router.get('/getedu/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
+router.get('/getedu/:id', async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 router.patch('/editedu/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -264,11 +289,16 @@ router.patch('/editedu/:id', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
-        const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
 
         if (!task) {
             return res.status(404).send()
@@ -298,59 +328,67 @@ router.delete('/delteedu/:id', async (req, res) => {
 
 //language
 
-router.patch('/addlang/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
+router.patch('/addlang/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!desc) {
             return res.status(404).send()
         }
         return res.send(desc)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 
-    router.get('/getlang/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
-        }
-    })
+router.get('/getlang/:id', async (req, res) => {
+    const _id = req.params.id
 
-    router.patch('/editlang/:id', auth, async (req, res) => {
-        const updates = Object.keys(req.body)
-        const allowedUpdates = ['language']
-        const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-    
-        if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid updates!' })
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    
-        try {
-            const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            updates.forEach((update) => task[update] = req.body[update])
-            await task.save()
-            res.send(task)
-        } catch (e) {
-            res.status(400).send(e)
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.patch('/editlang/:id', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['language']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
+    }
+
+    try {
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        updates.forEach((update) => task[update] = req.body[update])
+        await task.save()
+        res.send(task)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
 
 router.delete('/deletelang/:id', async (req, res) => {
     try {
@@ -370,59 +408,67 @@ router.delete('/deletelang/:id', async (req, res) => {
 // skills
 
 
-router.patch('/addskills/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
+router.patch('/addskills/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!desc) {
             return res.status(404).send()
         }
         return res.send(desc)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 
-    router.get('/getskills/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
-        }
-    })
+router.get('/getskills/:id', async (req, res) => {
+    const _id = req.params.id
 
-    router.patch('/editskills/:id', auth, async (req, res) => {
-        const updates = Object.keys(req.body)
-        const allowedUpdates = ['skills']
-        const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-    
-        if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid updates!' })
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    
-        try {
-            const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            updates.forEach((update) => task[update] = req.body[update])
-            await task.save()
-            res.send(task)
-        } catch (e) {
-            res.status(400).send(e)
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.patch('/editskills/:id', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['skills']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
+    }
+
+    try {
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        updates.forEach((update) => task[update] = req.body[update])
+        await task.save()
+        res.send(task)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
 
 router.delete('/deleteskills/:id', async (req, res) => {
     try {
@@ -439,59 +485,67 @@ router.delete('/deleteskills/:id', async (req, res) => {
 })
 //workhistory
 
-router.patch('/addwork/:id' , async(req , res) =>{
-    try{
-        const desc = await profileDetials.findByIdAndUpdate(req.params.id , req.body , {new:true , runValidators:true})
-        if(!desc){
+router.patch('/addwork/:id', async (req, res) => {
+    try {
+        const desc = await profileDetials.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!desc) {
             return res.status(404).send()
         }
         return res.send(desc)
     } catch (e) {
         res.status(400).send(e)
     }
-    
+
 })
 
 
-    router.get('/getwork/:id', async (req, res) => {
-        const _id = req.params.id
-    
-        try {
-            const task = await profileDetials.findById(_id)
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            res.send(task)
-        } catch (e) {
-            res.status(500).send()
-        }
-    })
+router.get('/getwork/:id', async (req, res) => {
+    const _id = req.params.id
 
-    router.patch('/editwork/:id', auth, async (req, res) => {
-        const updates = Object.keys(req.body)
-        const allowedUpdates = ['workhistory']
-        const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-    
-        if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid updates!' })
+    try {
+        const task = await profileDetials.findById(_id)
+
+        if (!task) {
+            return res.status(404).send()
         }
-    
-        try {
-            const task = await profileDetials.findOne({ _id: req.params.id, owner: req.user._id})
-    
-            if (!task) {
-                return res.status(404).send()
-            }
-    
-            updates.forEach((update) => task[update] = req.body[update])
-            await task.save()
-            res.send(task)
-        } catch (e) {
-            res.status(400).send(e)
+
+        res.send(task)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.patch('/editwork/:id', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['workhistory']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
+    }
+
+    try {
+        const task = await profileDetials.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        })
+
+        if (!task) {
+            return res.status(404).send()
         }
-    })
+
+        updates.forEach((update) => task[update] = req.body[update])
+        await task.save()
+        res.send(task)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
 
 router.delete('/deletework/:id', async (req, res) => {
     try {
@@ -615,4 +669,4 @@ res.status(400).send({error : error.message})
 
 */
 
-module.exports = router ;
+module.exports = router;

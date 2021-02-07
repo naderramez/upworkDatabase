@@ -4,6 +4,7 @@ const allFiles = require("../middleware/jobpost-uploads").files
 const multipleUpload = async (req, res) => {
   try {
     await upload(req, res);
+    console.log(req.files)
     if (req.files.length <= 0) {
       return res.send(`You must select at least 1 file.`);
     }

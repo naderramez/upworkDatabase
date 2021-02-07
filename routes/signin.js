@@ -8,11 +8,15 @@ const auth = require('../middleware/auth');
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
+        const userLogin = await User.find({ email: req.body.email, password: req.body.password})
+        if(userLogin){
+            console.log(userLogin)
+        }
         const token = await user.generateAuthToken()
-      
+        console.log(user,token)
         res.send ({ user, token })
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send(e)
     }
 })
 router.get('/users/me', auth, async (req, res) => {
