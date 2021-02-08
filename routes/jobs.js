@@ -592,7 +592,11 @@ router.post('/getmyproposals', async (req, res) => {
         for(let j = 0; j < jobsProposals[i].proposals.proposalsList.length; i++){
           if(jobsProposals[i].proposals.proposalsList[j].userId == req.body.userId){
             status =jobsProposals[i].proposals.proposalsList[j].status;
-            myProposalsJob.push(jobsProposals[i])
+            let proposals ={
+              jobId: jobsProposals[i]._id,
+              ...jobsProposals[i].proposals.proposalsList[j]
+            } 
+            myProposalsJob.push(proposals)
           }
         }
       }
