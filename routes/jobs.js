@@ -67,7 +67,29 @@ router.post("/getonejob", async (req, res) => {
         status = 2;
       }
     }
-    const newJob = [{...job[0]._doc, status: status}];
+    let currentJobsCount = 0;
+    let finishedJobsCount = 0;
+    let allJobsPosted = 0;
+    console.log(job)
+    let user = await User.findOne({_id: job[0].clientId});
+    let jobs = await Job.find({ clientId: job[0].clientId }, {});
+    for(let i = 0; i< jobs.length; i++) {
+      if(jobs[i].postStatus === 1){
+        currentJobsCount++;
+        allJobsPosted++;
+      }
+      if(jobs[i].postStatus === 2){
+        finishedJobsCount++;
+        allJobsPosted++;
+      }
+    }
+    let returnData = {
+      country: user.country,
+      allJobsPosted: allJobsPosted,
+      currentOpenJobs: currentJobsCount,
+      finishedJobs: finishedJobsCount
+    };
+    const newJob = [{...job[0]._doc, ...returnData,status: status}];
     console.log(newJob.status)
     console.log(newJob)
     res.send(newJob);
@@ -592,10 +614,8 @@ router.post('/getmyproposals', async (req, res) => {
         for(let j = 0; j < jobsProposals[i].proposals.proposalsList.length; i++){
           if(jobsProposals[i].proposals.proposalsList[j].userId == req.body.userId){
             status =jobsProposals[i].proposals.proposalsList[j].status;
-            let proposals ={
-              jobId: jobsProposals[i]._id,
-              ...jobsProposals[i].proposals.proposalsList[j]
-            } 
+            let job = await Job.find({ _id: jobsProposals[i]._id }, {});
+            let proposals ={...job[0]._doc, ...jobsProposals[i].proposals.proposalsList[j]} 
             myProposalsJob.push(proposals)
           }
         }
