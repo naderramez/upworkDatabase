@@ -15,10 +15,12 @@ const jobPostFiles = require("../middleware/jobpost-uploads").files;
 router.post("/getalljobs", async (req, res) => {
   try {
     var jobs = await Job.find();
+    var allJobs;
+    let returnJobs = [];
     var userId = req.body.userId;
-    jobs.map(async (job) => {
-      const likers = await Job.find({ _id: job._id }, { likers: 1, _id: 0 });
-      const dislikers = await Job.find(
+    jobs.map((job) => {
+      const likers = Job.find({ _id: job._id }, { likers: 1, _id: 0 });
+      const dislikers = Job.find(
         { _id: job._id },
         { dislikers: 1, _id: 0 }
       );
@@ -33,9 +35,11 @@ router.post("/getalljobs", async (req, res) => {
           status = 2;
         }
       }
-      job.status = status;
+      var newJob = job;
+      allJobs = {...allJobs,...newJob._doc, status: status}
+      returnJobs.push(allJobs)
     });
-    res.send(jobs);
+    res.send(returnJobs);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -63,8 +67,10 @@ router.post("/getonejob", async (req, res) => {
         status = 2;
       }
     }
-    job.status = status;
-    res.send(job);
+    const newJob = [{...job[0]._doc, status: status}];
+    console.log(newJob.status)
+    console.log(newJob)
+    res.send(newJob);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -78,6 +84,35 @@ router.get("/getclientjobs/:clientId", async (req, res) => {
     res.json({ message: err.message });
   }
 });
+//GET CLIENT DATA TO JOB PAGE
+router.post("/getclientjobdata", async (req, res) => {
+  let currentJobsCount = 0;
+  let finishedJobsCount = 0;
+  let allJobsPosted = 0;
+  try {
+    let user = await User.findOne({_id:req.body.clientId});
+    let jobs = await Job.find({ clientId: req.body.clientId }, {});
+    for(let i = 0; i< jobs.length; i++) {
+      if(jobs[i].postStatus === 1){
+        currentJobsCount++;
+        allJobsPosted++;
+      }
+      if(jobs[i].postStatus === 2){
+        finishedJobsCount++;
+        allJobsPosted++;
+      }
+    }
+    let returnData = {
+      country: user.country,
+      allJobsPosted: allJobsPosted,
+      currentOpenJobs: currentJobsCount,
+      finishedJobs: finishedJobsCount
+    };
+    res.send(returnData)
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+})
 //POST JOB STORE
 //UPLOAD FILES
 ////////////////////////هنااااااااااااااا///////////////////////////////
@@ -545,6 +580,29 @@ router.post("/getoneproposal", async (req, res) => {
     res.json({ message: err.message });
   }
 });
+//GET SPECIFIC FREELANCER'S PROPOSALS
+router.post('/getmyproposals', async (req, res) => {
+  try {
+    let jobsProposals = await Job.find({},{ proposals: 1, _id: 1});
+    let status = 0;
+    let myProposalsJob = [];
+    for(let i = 0; i < jobsProposals.length; i++) {
+      if(jobsProposals[i].proposals.proposalsList.length > 0) {
+        console.log("true")
+        for(let j = 0; j < jobsProposals[i].proposals.proposalsList.length; i++){
+          if(jobsProposals[i].proposals.proposalsList[j].userId == req.body.userId){
+            status =jobsProposals[i].proposals.proposalsList[j].status;
+            myProposalsJob.push(jobsProposals[i])
+          }
+        }
+      }
+    }
+    console.log(myProposalsJob)
+    res.send(myProposalsJob)
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+})
 
 //HIRING
 router.post("/acceptproposal", async (req, res) => {
