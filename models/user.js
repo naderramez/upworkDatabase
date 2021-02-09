@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
         }
     }]
 });
-  
+  //virtual field property mangoos 
 userSchema.virtual('tasks', {
     ref:'profileDetials',
     localField: '_id',
