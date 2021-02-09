@@ -20,18 +20,18 @@ router.get('/getdesc' , (req ,res)  =>{
 router.post("/multiple-upload", uploadController.multipleUpload);
 
 // add profile description
-router.post('/adddesc' , auth , async (req , res) =>{
-const desc = new profileDetials({
+router.post('/adddesc', auth, async (req, res) => {
+    const desc = new profileDetials({
         ...req.body,
-  owner: req.user._id
-})
+        owner: req.user._id
+    })
 
-try {
-await desc.save()
-res.status(201).send(desc)
-} catch (e) {
-res.status(400).send(e)
-}
+    try {
+        await desc.save()
+        res.status(201).send(desc)
+    } catch (e) {
+        res.status(400).send(e)
+    }
 
 })
 
@@ -64,7 +64,9 @@ router.patch('/deletedesc',auth, async (req, res) => {
    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
    const task= await profileDetials.updateOne({owner:req.user._id},{$set:{description:''}});
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -81,6 +83,9 @@ router.patch('/deletedesc',auth, async (req, res) => {
         res.status(400).send(e)
     }
 })
+//delete description by patch set value zero
+
+
 
 // add all data of profile detials
 router.patch('/addprofileinfo', auth, async (req, res) => {
@@ -90,7 +95,9 @@ router.patch('/addprofileinfo', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -115,7 +122,9 @@ router.patch('/editprofileinfo', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -162,7 +171,9 @@ router.patch('/deletetitle', auth,async (req, res) => {
    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
    const task= await profileDetials.updateOne({owner:req.user._id},{$set:{jobtitle:''}});
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -203,7 +214,6 @@ router.patch('/deleteedu', auth,async (req, res) => {
         res.status(400).send(e)
     }
 })
-
 
 
 
@@ -282,4 +292,4 @@ router.patch('/deletelang', auth,async (req, res) => {
 })
 
 
-module.exports = router ;
+module.exports = router;

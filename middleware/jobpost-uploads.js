@@ -1,19 +1,18 @@
 const util = require("util");
 const path = require("path");
 const multer = require("multer");
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart();
-const maxSize = 7 * 1024 * 1024 * 1024;
+const maxSize = 5 * 1024 * 1024 * 1024;
 let files = [];
 
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(`${__dirname}/../jpbpost-uploads`));
+    callback(null, path.join(`${__dirname}/../jobpost-uploads`));
   },
   filename: (req, file, callback) => {
-    const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.ms-powerpoint"];
+    const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-powerpoint"];
+
     if (match.indexOf(file.mimetype) === -1) {
-      var message = `${file.originalname} is invalid. Only accept png/jpeg/gif/txt/html/js/css/pdf/docx/xls/ppt.`;
+      var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
       return callback(message, null);}
     console.log(file.originalname);
     console.log(file);
@@ -23,6 +22,7 @@ var storage = multer.diskStorage({
     console.log(files)
   }
 });
+
 let uploadFile = multer({
   storage: storage,
   limits: { fileSize: maxSize },
@@ -37,6 +37,8 @@ let uploadFile = multer({
     cb(undefined, true); // continue with upload
   }
 }).array("multi-files", 10);
+
+
 //var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
 var uploadFilesMiddleware = util.promisify(uploadFile);
 module.exports = {uploadFilesMiddleware, files};

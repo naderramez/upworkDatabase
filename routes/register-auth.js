@@ -23,11 +23,13 @@ router.post('/', async (req, res)=>{
         lastName:req.body.lastName,
         email:req.body.email,
         country:req.body.country,
-        //password:hashPassword , // update reem
         password:req.body.password,
-        type:req.body.type
-      //  description:req.body.description,
-        //education:req.body.education
+        type:req.body.type,
+        paymentAccount: {
+            totalAmount: 5000,
+            holdAmount:0,
+            availableAmount:5000 
+        }
     });
     try{
         const savedUser = await user.save();
