@@ -8,7 +8,6 @@ const proposalUpload = require("../middleware/proposals-uploads").uploadFilesMid
 const proposalFiles = require("../middleware/proposals-uploads").files
 const jobUpload = require("../middleware/job-uploads");
 const jobFiles = require("../middleware/job-uploads").files
-
 //uploadfile
 router.post("/multiple-upload", uploadController.multipleUpload);
 
@@ -29,19 +28,22 @@ res.status(400).send(e)
 })
 
 //get by populate & auth of login desc of user
-router.get('/allinfo', auth, async (req, res) => {
-    try {
-        await req.user.populate('tasks').execPopulate()
-        res.send(req.user.tasks)
-    } catch (e) {
-        res.status(500).send()
-    }
-})
+
 
 router.get('/alluser', auth, async (req, res) => {
     try {
         await req.user.populate('owner').execPopulate()
         res.send(req.user.owner)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+//get by populate & auth of login desc of user
+router.get('/allinfo', auth, async (req, res) => {
+    try {
+        await req.user.populate('tasks').execPopulate()
+        res.send(req.user.tasks)
     } catch (e) {
         res.status(500).send()
     }
@@ -60,10 +62,12 @@ router.get('/getdesc' , (req ,res)  =>{
 router.patch('/editdesc', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
+   const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+   const task= await profileDetials.updateOne({owner:req.user._id},{$set:{description:''}});
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -73,7 +77,7 @@ router.patch('/editdesc', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        updates.forEach((update) => task[update] = req.body[update])
+      //  updates.forEach((update) => task[update] = req.body[update])
         await task.save()
         res.send(task)
     } catch (e) {
@@ -109,6 +113,11 @@ router.patch('/deletedesc',auth, async (req, res) => {
 //pricepost
 //addprice in database
 //PI FOR ADD ALLprofile
+//delete description by patch set value zero
+
+
+
+// add all data of profile detials
 router.patch('/addprofileinfo', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates =
@@ -116,7 +125,9 @@ router.patch('/addprofileinfo', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -142,7 +153,9 @@ router.patch('/editprofileinfo', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -159,6 +172,7 @@ router.patch('/editprofileinfo', auth, async (req, res) => {
         res.status(400).send(e)
     }
 })
+
 
 router.patch('/deleteprice', auth,async (req, res) => {
     const updates = Object.keys(req.body)
@@ -190,7 +204,9 @@ router.patch('/deletetitle', auth,async (req, res) => {
    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
    const task= await profileDetials.updateOne({owner:req.user._id},{$set:{jobtitle:''}});
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        return res.status(400).send({
+            error: 'Invalid updates!'
+        })
     }
 
     try {
@@ -234,6 +250,8 @@ router.patch('/deleteedu', auth,async (req, res) => {
 
 
 
+
+
 router.patch('/deleteskills', auth,async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['skills']
@@ -257,6 +275,9 @@ router.patch('/deleteskills', auth,async (req, res) => {
         res.status(400).send(e)
     }
 })
+
+
+
 
 
 
@@ -315,3 +336,5 @@ router.patch('/deletelang', auth,async (req, res) => {
 
 
 module.exports = router ;
+
+
