@@ -15,31 +15,33 @@ const jobPostFiles = require("../middleware/jobpost-uploads").files;
 router.post("/getalljobs", async (req, res) => {
   try {
     var jobs = await Job.find();
-    var allJobs;
-    let returnJobs = [];
-    var userId = req.body.userId;
-    jobs.map((job) => {
-      const likers = Job.find({ _id: job._id }, { likers: 1, _id: 0 });
-      const dislikers = Job.find(
-        { _id: job._id },
-        { dislikers: 1, _id: 0 }
-      );
-      var status = 0;
-      for (var i = 0; i < likers.length; i++) {
-        if (likers[i] == userId) {
+    var allJobsData = [];
+    for(let j of jobs){
+      let status = 0;
+      var user = await User.findOne({_id:j.clientId},{country:1,_id:0})
+      for (var i = 0; i < j.likers.length; i++) {
+        if (j.likers[i] == req.body.userId) {
           status = 1;
         }
       }
-      for (var i = 0; i < dislikers.length; i++) {
-        if (dislikers[i].id == userId) {
+      let reason = 0;
+      for (var i = 0; i < j.dislikers.length; i++) {
+        if (j.dislikers[i].userId == req.body.userId) {
           status = 2;
+          reason = j.dislikers[i].reason;
+          console.log(j.dislikers[i])
+          console.log(reason);
         }
       }
-      var newJob = job;
-      allJobs = {...allJobs,...newJob._doc, status: status}
-      returnJobs.push(allJobs)
-    });
-    res.send(returnJobs);
+      if(reason){
+        j = {...j._doc, clientCountry:user.country, status:status, reason:reason}
+      }
+      else{
+        j = {...j._doc, clientCountry:user.country, status:status}
+      }
+      allJobsData.push(j)
+    }
+      res.send(allJobsData);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -615,7 +617,7 @@ router.post('/getmyproposals', async (req, res) => {
           if(jobsProposals[i].proposals.proposalsList[j].userId == req.body.userId){
             status =jobsProposals[i].proposals.proposalsList[j].status;
             let job = await Job.find({ _id: jobsProposals[i]._id }, {});
-            let proposals ={...job[0]._doc, ...jobsProposals[i].proposals.proposalsList[j]} 
+            let proposals ={myjob: job[0] ,...jobsProposals[i].proposals.proposalsList[j]} 
             myProposalsJob.push(proposals)
           }
         }

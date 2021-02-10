@@ -33,7 +33,7 @@ app.use('/api/user',signin);
 app.use('/api/user', profile);
 app.use('/api/job',jobRoute);
 
-app.listen(3000);
+app.listen(8080);
 
 /*
 const jwt = require('jsonwebtoken')
