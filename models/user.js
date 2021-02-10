@@ -47,12 +47,12 @@ const userSchema = new mongoose.Schema({
     },
   ],
 });
-
-userSchema.virtual("tasks", {
-  ref: "profileDetials",
-  localField: "_id",
-  foreignField: "owner",
-});
+  //virtual field property mangoos 
+userSchema.virtual('tasks', {
+    ref:'profileDetials',
+    localField: '_id',
+    foreignField: 'owner'
+})
 
 // token
 userSchema.methods.generateAuthToken = async function () {
