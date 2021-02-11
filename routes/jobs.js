@@ -108,6 +108,15 @@ router.get("/getclientjobs/:clientId", async (req, res) => {
     res.json({ message: err.message });
   }
 });
+//GET CLIENT DATA
+router.post('/getclientdata',async (req, res) => {
+  try {
+    let clientData = await User.findOne({_id:req.body.clientId});
+    res.json(clientData);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+})
 //GET CLIENT DATA TO JOB PAGE
 router.post("/getclientjobdata", async (req, res) => {
   let currentJobsCount = 0;
@@ -516,6 +525,22 @@ router.post("/createproposal", async (req, res) => {
     res.json({ message: err.message });
   }
 });
+router.post('/uploadproposlsfiles', async (req, res)=>{
+  try {
+    await proposalUpload(req, res);
+    console.log(req)
+    if (req.files.length <= 0) {
+      return res.send(`You must select at least 1 file.`);
+    }
+    console.log(req.files.originalname);
+  } catch (error) {
+    console.log(error);
+    if (error.code === "LIMIT_UNEXPECTED_FILE") {
+      return res.send("Too many files to upload.");
+    }
+    return res.send(`Error when trying upload many files: ${error}`);
+  }
+})
 //WITHDRAW PROPOSAL
 router.post("/withdrawproposal", async (req, res) => {
   try {
