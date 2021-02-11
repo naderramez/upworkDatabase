@@ -39,7 +39,13 @@ router.post("/getalljobs", async (req, res) => {
       }
       allJobsData.push(j)
     }
-      res.send(allJobsData);
+    let sendedData = [];
+    for(let j = allJobsData.length-1;j > 0; j--){
+      sendedData.push(allJobsData[j]);
+      
+    }
+    console.log(sendedData)
+      res.send(sendedData);
   } catch (err) {
     res.json({ message: err.message });
   }
