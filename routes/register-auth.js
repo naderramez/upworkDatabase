@@ -25,7 +25,11 @@ router.post('/', async (req, res)=>{
         country:req.body.country,
         password:req.body.password,
         type:req.body.type,
-        paymentAccount: {
+        paymentAccount: req.body.type === "freelancer"?{
+            totalAmount: 0,
+            holdAmount:0,
+            availableAmount:0 
+        }: {
             totalAmount: 5000,
             holdAmount:0,
             availableAmount:5000 

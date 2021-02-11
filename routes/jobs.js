@@ -29,8 +29,6 @@ router.post("/getalljobs", async (req, res) => {
         if (j.dislikers[i].userId == req.body.userId) {
           status = 2;
           reason = j.dislikers[i].reason;
-          console.log(j.dislikers[i])
-          console.log(reason);
         }
       }
       if(reason){
@@ -72,7 +70,6 @@ router.post("/getonejob", async (req, res) => {
     let currentJobsCount = 0;
     let finishedJobsCount = 0;
     let allJobsPosted = 0;
-    console.log(job)
     let user = await User.findOne({_id: job[0].clientId});
     let jobs = await Job.find({ clientId: job[0].clientId }, {});
     for(let i = 0; i< jobs.length; i++) {
@@ -92,8 +89,6 @@ router.post("/getonejob", async (req, res) => {
       finishedJobs: finishedJobsCount
     };
     const newJob = [{...job[0]._doc, ...returnData,status: status}];
-    console.log(newJob.status)
-    console.log(newJob)
     res.send(newJob);
   } catch (err) {
     res.json({ message: err.message });
@@ -428,7 +423,6 @@ router.post("/dislike", async (req, res) => {
       { dislikers: 1, _id: 0 }
     );
     dislikers = dislikers[0].dislikers;
-    console.log(dislikers);
     dislikers.push(dislikObj);
     const updatedJob = await Job.updateOne(
       { _id: req.body.jobId },
@@ -450,7 +444,6 @@ router.post("/unlike", async (req, res) => {
         newLikers.push(likers[i]);
       }
     }
-    console.log(newLikers);
     const updatedJob = await Job.updateOne(
       { _id: req.body.jobId },
       { $set: { likers: newLikers } }
@@ -467,7 +460,6 @@ router.post("/undislike", async (req, res) => {
       { _id: req.body.jobId },
       { dislikers: 1, _id: 0 }
     );
-    console.log(dislikers);
     dislikers = dislikers[0].dislikers;
     newDislikers = [];
     for (let i = 0; i < dislikers.length; i++) {
@@ -475,7 +467,6 @@ router.post("/undislike", async (req, res) => {
         newDislikers.push(dislikers[i]);
       }
     }
-    console.log(newDislikers);
     const updatedJob = await Job.updateOne(
       { _id: req.body.jobId },
       { $set: { dislikers: newDislikers } }
@@ -502,13 +493,10 @@ router.post("/createproposal", async (req, res) => {
     },
   };
   try {
-    await proposalUpload(req, res);
-    newProposal.proposal.proposalFiles = proposalFiles;
     let proposals = await Job.find(
       { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
     );
-    console.log(proposals);
     proposals = proposals[0].proposals;
     if (proposals == null) {
       proposals.proposalsList[0] = newProposal;
@@ -548,9 +536,7 @@ router.post("/withdrawproposal", async (req, res) => {
       { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
     );
-    console.log(proposals);
     proposals = proposals.proposals;
-    console.log(proposals);
     if (proposals == null) {
       res.send("There are not proposals");
     }
@@ -633,14 +619,11 @@ router.post("/getoneproposal", async (req, res) => {
 router.post('/getmyproposals', async (req, res) => {
   try {
     let jobsProposals = await Job.find({},{ proposals: 1, _id: 1});
-    let status = 0;
     let myProposalsJob = [];
     for(let i = 0; i < jobsProposals.length; i++) {
-      if(jobsProposals[i].proposals.proposalsList.length > 0) {
-        console.log("true")
-        for(let j = 0; j < jobsProposals[i].proposals.proposalsList.length; i++){
+      if(jobsProposals[i].proposals.length > 0) {
+        for(let j = 0; j < jobsProposals[i].proposals.length; j++){
           if(jobsProposals[i].proposals.proposalsList[j].userId == req.body.userId){
-            status =jobsProposals[i].proposals.proposalsList[j].status;
             let job = await Job.find({ _id: jobsProposals[i]._id }, {});
             let proposals ={myjob: job[0] ,...jobsProposals[i].proposals.proposalsList[j]} 
             myProposalsJob.push(proposals)
@@ -648,13 +631,54 @@ router.post('/getmyproposals', async (req, res) => {
         }
       }
     }
-    console.log(myProposalsJob)
     res.send(myProposalsJob)
   } catch (err) {
     res.json({ message: err.message });
   }
 })
+//GET ONE PROPOSAL OF FREELANCER'S PROPOSALS
+router.post('/getoneofmyproposals', async (req, res) => {
+  try {
+    let myProposalJob = await Job.find({_id: req.body.jobId}, {proposals:1, _id:0});
+    myProposalJob = myProposalJob[0].proposals;
+    let myJob = await Job.find({_id: req.body.jobId});
+    let myProposal = [];
+    for(let i = 0; i < myProposalJob.length; i++) {
+      console.log(myProposalJob.proposalsList[i].userId == req.body.userId)
+      if(myProposalJob.proposalsList[i].userId == req.body.userId) {
+        let proposal = {myJob: myJob[0], ...myProposalJob.proposalsList[i]}
+        myProposal.push(proposal);
+      }
+    }
+    let user = await User.findOne({_id: myJob[0].clientId});
+    let jobs = await Job.find({ clientId: myJob[0].clientId }, {});
+    let currentJobsCount = 0;
+    let finishedJobsCount = 0;
+    let allJobsPosted = 0;
+    for(let i = 0; i< jobs.length; i++) {
+      if(jobs[i].postStatus === 1){
+        currentJobsCount++;
+        allJobsPosted++;
+      }
+      if(jobs[i].postStatus === 2){
+        finishedJobsCount++;
+        allJobsPosted++;
+      }
+    }
+    let returnData = {
+      country: user.country,
+      allJobsPosted: allJobsPosted,
+      currentOpenJobs: currentJobsCount,
+      finishedJobs: finishedJobsCount
+    };
+    myProposal = {...myProposal, clientData: returnData};
+    console.log(myProposal);
+    res.send(myProposal);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
 
+})
 //HIRING
 router.post("/acceptproposal", async (req, res) => {
   try {
@@ -670,6 +694,9 @@ router.post("/acceptproposal", async (req, res) => {
         proposals.proposalsList[i].proposal.status = 2; //hired
         proposal = proposals.proposalsList[i];
         proposalNo = i;
+      }
+      else{
+        proposals.proposalsList[i].proposal.status = -1;
       }
     }
     let updatedJob = await Job.updateOne(
@@ -689,7 +716,6 @@ router.post("/acceptproposal", async (req, res) => {
       { $set: { hiring: hiring } }
     );
     let job = await Job.find({ _id: req.body.jobId }, {});
-    console.log(hiring.hiringList.length);
     if (job[0].freelancersNo == hiring.length) {
       updatedJob = await Job.updateOne(
         { _id: req.body.jobId },
@@ -714,12 +740,10 @@ router.post("/acceptproposal", async (req, res) => {
     clientAccount.availableAmount = clientAccount.totalAmount-clientAccount.holdAmount;
     console.log(clientAccount);
     let freelancer = await User.findOne({_id: req.body.userId},{paymentAccount:1,_id:0});
-    console.log("freelancer" + freelancer);
     let freelancerAccount = freelancer.paymentAccount;
     freelancerAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
     freelancerAccount.totalAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
     freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
-    console.log(freelancerAccount);
     await User.updateOne(
       { _id: job[0].clientId },
       {
@@ -801,15 +825,12 @@ router.post("/receivejob", async (req, res) => {
         hiring[i].receiveJob = receiveJob;
       }
     }
-    console.log(hiring)
     for (let i = 0; i < proposals.length; i++) {
       if (proposals[i].userId == req.body.userId) {
         proposals[i].proposal.status = 3; //job finished
         hiringNo = i;
-        console.log(proposals[i])
       }
     }
-    console.log(req.body.userId);
     updatedJob = await Job.updateOne(
       { _id: req.body.jobId },
       { $set: { proposals: proposals, hiring: hiring } }
