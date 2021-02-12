@@ -500,7 +500,7 @@ router.post("/saveimage",async (req, res) => {
 router.get("/getimage/:userId",async (req, res) => {
   try {
     let user = await User.findOne(
-      { _id: req.body.userId },{userImage:1, _id:0}
+      { _id: req.params.userId },{userImage:1, _id:0}
     );
     res.send(user);
   } catch (err) {
