@@ -482,7 +482,31 @@ router.post("/undislike", async (req, res) => {
     res.json({ message: err.message });
   }
 });
-
+//SAVE IMAGE
+router.post("/saveimage",async (req, res) => {
+  try {
+    const updatedUser = await User.updateOne(
+      { _id: req.body.userId },
+      { $set: { userUser: req.body.image } }
+    );
+    let user = await User.find(
+      { _id: req.body.userId }
+    );
+    res.send(user);
+  } catch (err) {
+    res.json({message: err.message})
+  }
+})
+router.get("/getimage/:userId",async (req, res) => {
+  try {
+    let user = await User.find(
+      { _id: req.body.userId },{image:1, _id:0}
+    );
+    res.send(user);
+  } catch (err) {
+    res.json({message: err.message})
+  }
+}) 
 //PROPOSALS
 //CREATE PROPOSAL
 router.post("/createproposal", async (req, res) => {
@@ -649,11 +673,13 @@ router.post('/getoneofmyproposals', async (req, res) => {
     myProposalJob = myProposalJob[0].proposals;
     let myJob = await Job.find({_id: req.body.jobId});
     let myProposal = [];
+    console.log(myProposalJob.length)
     for(let i = 0; i < myProposalJob.length; i++) {
       console.log(myProposalJob.proposalsList[i].userId == req.body.userId)
       if(myProposalJob.proposalsList[i].userId == req.body.userId) {
         let proposal = {myJob: myJob[0], ...myProposalJob.proposalsList[i]}
         myProposal.push(proposal);
+        console.log(proposal)
       }
     }
     let user = await User.findOne({_id: myJob[0].clientId});
@@ -661,6 +687,7 @@ router.post('/getoneofmyproposals', async (req, res) => {
     let currentJobsCount = 0;
     let finishedJobsCount = 0;
     let allJobsPosted = 0;
+    console.log(user)
     for(let i = 0; i< jobs.length; i++) {
       if(jobs[i].postStatus === 1){
         currentJobsCount++;
@@ -677,13 +704,12 @@ router.post('/getoneofmyproposals', async (req, res) => {
       currentOpenJobs: currentJobsCount,
       finishedJobs: finishedJobsCount
     };
-    myProposal = {...myProposal, clientData: returnData};
+    myProposal = {myProposal, clientData: returnData};
     console.log(myProposal);
     res.send(myProposal);
   } catch (err) {
     res.json({ message: err.message });
   }
-
 })
 //HIRING
 router.post("/acceptproposal", async (req, res) => {
@@ -817,30 +843,27 @@ router.post("/receivejob", async (req, res) => {
     await proposalUpload(req, res);
     receiveJob.jobFiles = jobFiles;
     let job = await Job.find({ _id: req.body.jobId }, {});
-    let hiring = await Job.find({ _id: req.body.jobId }, { hiring: 1, _id: 0 });
     let proposals = await Job.find(
       { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
     );
+    console.log(proposals[0].proposals)
     let hiringNo = 0;
-    hiring = hiring[0].hiring.hiringList;
-    proposals = proposals[0].proposals.proposalsList;
-    for (let i = 0; i < hiring.length; i++) {
-      if (hiring[i].userId == req.body.userId) {
-        hiring[i].proposal.status = 3; //job finished
-        hiring[i].receiveJob = receiveJob;
-      }
-    }
+    proposals = proposals[0].proposals;
+    console.log(proposals)
     for (let i = 0; i < proposals.length; i++) {
-      if (proposals[i].userId == req.body.userId) {
-        proposals[i].proposal.status = 3; //job finished
+      if (proposals.proposalsList[i].userId == req.body.userId) {
+        proposals.proposalsList[i].proposal.status = 3; //job finished
         hiringNo = i;
+        proposals.proposalsList[i] = {...proposals.proposalsList[0], receiveJob }
       }
     }
+    console.log(proposals)
     updatedJob = await Job.updateOne(
       { _id: req.body.jobId },
-      { $set: { proposals: proposals, hiring: hiring } }
+      { $set: { proposals: proposals } }
     ); //finished
+    let sendedJob = await Job.findOne({ _id: req.body.jobId});
     let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
     let clientAccount = client.paymentAccount;
     clientAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
@@ -869,7 +892,7 @@ router.post("/receivejob", async (req, res) => {
         },
       }
     );
-    res.json(hiring);
+    res.json(sendedJob);
   } catch (err) {
     res.json({ message: err.message });
   }

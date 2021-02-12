@@ -38,6 +38,9 @@ const userSchema = new mongoose.Schema({
   paymentAccount:{
       type: Object
   },
+  userImage:{
+    type:String
+  },
   tokens: [
     {
       token: {
