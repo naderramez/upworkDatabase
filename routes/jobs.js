@@ -487,9 +487,9 @@ router.post("/saveimage",async (req, res) => {
   try {
     const updatedUser = await User.updateOne(
       { _id: req.body.userId },
-      { $set: { userUser: req.body.image } }
+      { $set: { userImage: req.body.image } }
     );
-    let user = await User.find(
+    let user = await User.findOne(
       { _id: req.body.userId }
     );
     res.send(user);
@@ -499,8 +499,8 @@ router.post("/saveimage",async (req, res) => {
 })
 router.get("/getimage/:userId",async (req, res) => {
   try {
-    let user = await User.find(
-      { _id: req.body.userId },{image:1, _id:0}
+    let user = await User.findOne(
+      { _id: req.body.userId },{userImage:1, _id:0}
     );
     res.send(user);
   } catch (err) {

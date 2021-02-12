@@ -33,7 +33,8 @@ router.post('/', async (req, res)=>{
             totalAmount: 5000,
             holdAmount:0,
             availableAmount:5000 
-        }
+        },
+        userImage:""
     });
     try{
         const savedUser = await user.save();
