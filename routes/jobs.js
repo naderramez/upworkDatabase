@@ -490,12 +490,15 @@ router.post("/saveimage",async (req, res) => {
     await imageUpload(req, res);
     console.log(req)
     console.log(req.files);
+    console.log("this is image" , image)
     if (req.files.length <= 0) {
       return res.send(`You must select at least 1 file.`);
     }
     let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:image}});
-    
-    return res.send(user);
+    console.log("this is image" , image)
+    let updateduser = await User.findOne({_id: req.headers.userid});
+    console.log(updateduser);
+    return res.send(updateduser);
   } catch (error) {
     console.log(error);
     if (error.code === "LIMIT_UNEXPECTED_FILE") {
