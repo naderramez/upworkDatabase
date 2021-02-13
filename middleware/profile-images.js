@@ -2,7 +2,7 @@ const util = require("util");
 const path = require("path");
 const multer = require("multer");
 const maxSize = 5 * 1024 * 1024 * 1024;
-let files = [];
+let image = [];
 
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -18,8 +18,8 @@ var storage = multer.diskStorage({
     console.log(file);
     callback(null, `${new Date().getTime()}_${file.originalname}`);
     console.log(`${new Date().getTime()}_${file.originalname}`)
-    files.push(`${new Date().getTime()}_${file.originalname}`)
-    console.log(files)
+    image.push(`${new Date().getTime()}_${file.originalname}`)
+    console.log(image)
   }
 });
 

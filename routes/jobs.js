@@ -11,7 +11,7 @@ const JobPostUpload = require("../middleware/jobpost-uploads")
   .uploadFilesMiddleware;
 const jobPostFiles = require("../middleware/jobpost-uploads").files;
 const imageUpload = require("../middleware/profile-images").uploadFilesMiddleware;
-const image = require("../middleware/jobpost-uploads").file;
+const image = require("../middleware/profile-images").image;
 
 //GET ALL JOBS WITH LIKERS AND DISLIKERS STATUS
 router.post("/getalljobs", async (req, res) => {
@@ -853,19 +853,14 @@ router.post("/resetpayment", async (req, res) => {
 //RECEIVE JOB
 router.post("/receivejob", async (req, res) => {
   try {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     console.log(req.files)
-    console.log(req.headers)
-
-    await jobUpload(req, res);
-
     let receiveJob = {
       message: req.headers.message,
       receivedJobFiles : jobFiles
     };
     console.log("jobFiles",jobFiles);
     console.log("receiveeeeeeeeeeeee", receiveJob.files);
-    let job = await Job.find({ _id: req.headers.jobid }, {});
+    let job = await Job.find({ _id: req.body.jobid }, {});
     let proposals = await Job.find(
       { _id: req.headers.jobid },
       { proposals: 1, _id: 0 }
