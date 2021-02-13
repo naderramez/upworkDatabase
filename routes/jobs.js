@@ -486,6 +486,8 @@ router.post("/undislike", async (req, res) => {
 router.post("/saveimage",async (req, res) => {
   try {
     const updatedUser = await User.updateOne(
+      console.log(req.body),
+      console.log(req.body.image),
       { _id: req.body.userId },
       { $set: { userImage: req.body.image } }
     );
@@ -614,7 +616,7 @@ router.get("/downloadproposalfiles/:name", async (req, res) => {
   });
 });
 //GET ALL PROPOSALS OF A SPECIFIC JOB
-router.get("/getproposals/:jobId", async (req, res) => {
+router.post("/getproposals/:jobId", async (req, res) => {
   try {
     let proposals = await Job.find(
       { _id: req.body.jobId },
