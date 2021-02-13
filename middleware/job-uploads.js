@@ -1,14 +1,12 @@
 const util = require("util");
 const path = require("path");
 const multer = require("multer");
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart();
 const maxSize = 7 * 1024 * 1024 * 1024;
-let files = [];
 
+let files = [];
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(`${__dirname}/../jpb-uploads`));
+    callback(null, path.join(`${__dirname}/../job-uploads`));
   },
   filename: (req, file, callback) => {
     const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.ms-powerpoint"];
@@ -20,7 +18,7 @@ var storage = multer.diskStorage({
     callback(null, `${new Date().getTime()}_${file.originalname}`);
     console.log(`${new Date().getTime()}_${file.originalname}`)
     files.push(`${new Date().getTime()}_${file.originalname}`)
-    console.log(files)
+    console.log("files in middleware",files)
   }
 });
 let uploadFile = multer({
@@ -36,7 +34,6 @@ let uploadFile = multer({
     }
     cb(undefined, true); // continue with upload
   }
-}).array("multi-files", 10);
-//var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
+}).array("file", 10);
 var uploadFilesMiddleware = util.promisify(uploadFile);
 module.exports = {uploadFilesMiddleware, files};

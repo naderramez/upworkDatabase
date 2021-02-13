@@ -1,9 +1,8 @@
 const util = require("util");
 const path = require("path");
 const multer = require("multer");
-// const multipart = require('connect-multiparty');
-// const multipartMiddleware = multipart();
 const maxSize = 7 * 1024 * 1024 * 1024;
+
 let files = [];
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -19,7 +18,7 @@ var storage = multer.diskStorage({
     callback(null, `${new Date().getTime()}_${file.originalname}`);
     console.log(`${new Date().getTime()}_${file.originalname}`)
     files.push(`${new Date().getTime()}_${file.originalname}`)
-    console.log(files)
+    console.log("files in middleware",files)
   }
 });
 let uploadFile = multer({
@@ -35,7 +34,6 @@ let uploadFile = multer({
     }
     cb(undefined, true); // continue with upload
   }
-}).array("multi-files", 10);
-//var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
+}).array("file", 10);
 var uploadFilesMiddleware = util.promisify(uploadFile);
 module.exports = {uploadFilesMiddleware, files};
