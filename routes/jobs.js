@@ -10,7 +10,7 @@ const jobFiles = require("../middleware/job-uploads").files;
 const JobPostUpload = require("../middleware/jobpost-uploads")
   .uploadFilesMiddleware;
 const jobPostFiles = require("../middleware/jobpost-uploads").files;
-const imageUpload = require("../middleware/jobpost-uploads").uploadFilesMiddleware;
+const imageUpload = require("../middleware/profile-images").uploadFilesMiddleware;
 const image = require("../middleware/jobpost-uploads").file;
 
 //GET ALL JOBS WITH LIKERS AND DISLIKERS STATUS
