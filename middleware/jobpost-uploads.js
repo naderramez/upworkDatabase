@@ -36,7 +36,7 @@ let uploadFile = multer({
     }
     cb(undefined, true); // continue with upload
   }
-}).array("multi-files", 10);
+}).array("file", 10);
 
 
 //var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
