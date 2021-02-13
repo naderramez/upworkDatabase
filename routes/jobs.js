@@ -853,33 +853,25 @@ router.post("/resetpayment", async (req, res) => {
 //RECEIVE JOB
 router.post("/receivejob", async (req, res) => {
   try {
-    console.log(req.files)
-    let receiveJob = {
-      message: req.headers.message,
-      receivedJobFiles : jobFiles
-    };
-    console.log("jobFiles",jobFiles);
-    console.log("receiveeeeeeeeeeeee", receiveJob.files);
     let job = await Job.find({ _id: req.body.jobid }, {});
     let proposals = await Job.find(
-      { _id: req.headers.jobid },
+      { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
     );
     let hiringNo = 0;
     console.log(proposals)
     proposals = proposals[0].proposals;
     for (let i = 0; i < proposals.length; i++) {
-      if (proposals.proposalsList[i].userId == req.headers.userid) {
+      if (proposals.proposalsList[i].userId == req.body.userId) {
         proposals.proposalsList[i].proposal.status = 3; //job finished
         hiringNo = i;
-        proposals.proposalsList[i] = {...proposals.proposalsList[0], receiveJob }
       }
     }
     updatedJob = await Job.updateOne(
-      { _id: req.headers.jobid },
+      { _id: req.body.jobId },
       { $set: { proposals: proposals } }
     ); //finished
-    let sendedJob = await Job.findOne({ _id: req.headers.jobid});
+    let sendedJob = await Job.findOne({ _id: req.body.jobId});
     let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
     let clientAccount = client.paymentAccount;
     clientAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
@@ -898,7 +890,7 @@ router.post("/receivejob", async (req, res) => {
       }
     );
     await User.updateOne(
-      { _id: req.headers.userid },
+      { _id: req.body.userID },
       {
         $set: {
           paymentAccount: freelancerAccount
@@ -910,42 +902,46 @@ router.post("/receivejob", async (req, res) => {
     res.json({ message: err.message });
   }
 });
-// router.post('/uploadjobfiles',async (req, res)=>{
-//   try {
-//     await jobUpload(req, res);
-//     let proposals = await Job.find(
-//       { _id: req.headers.jobid },
-//       { proposals: 1, _id: 0 }
-//     );
-//     let files = [];
-//     console.log("jobFiles", jobFiles)
-//     for(let i = 0; i < jobFiles.length; i++) {
-//       files[i] = proposalFiles[i]
-//     }
-//     console.log(files)
-//     proposals = proposals[0].proposals;
-//     console.log(proposals)
-//     for(let i = 0; i < proposals.proposalsList.length; i++) {
-//       if(proposals.proposalsList[i].userId == req.headers.userId){
-//         proposals.proposalsList[i].receiveJob.jobFiles = files;
-//       }
-//     }
-//     const updatedJob = await Job.updateOne(
-//       { _id: req.headers.jobid },
-//       { $set: { proposals: proposals } }
-//     ); 
-//     const updated = await Job.findOne({_id: req.headers.jobId})
-//     res.send(updated);
+router.post('/uploadjobfiles',async (req, res)=>{
+  try {
+    await jobUpload(req, res);
+    let receiveJob = {
+      message: req.headers.message,
+      receivedJobFiles : jobFiles
+    };
+    let proposals = await Job.find(
+      { _id: req.headers.jobid },
+      { proposals: 1, _id: 0 }
+    );
+    let files = [];
+    console.log("jobFiles", jobFiles)
+    for(let i = 0; i < jobFiles.length; i++) {
+      files[i] = proposalFiles[i]
+    }
+    console.log(files)
+    proposals = proposals[0].proposals;
+    console.log(proposals)
+    for(let i = 0; i < proposals.proposalsList.length; i++) {
+      if(proposals.proposalsList[i].userId == req.headers.userId){
+        proposals.proposalsList[i] = {...proposals.proposalsList[0], receiveJob }
+      }
+    }
+    const updatedJob = await Job.updateOne(
+      { _id: req.headers.jobid },
+      { $set: { proposals: proposals } }
+    ); 
+    const updated = await Job.findOne({_id: req.headers.jobId})
+    res.send(updated);
     
-//     res.send(jobFiles);
-//   } catch (error) {
-//     console.log(error);
-//     if (error.code === "LIMIT_UNEXPECTED_FILE") {
-//       return res.send("Too many files to upload.");
-//     }
-//     return res.send(`Error when trying upload many files: ${error}`);
-//   }
-// })
+    res.send(jobFiles);
+  } catch (error) {
+    console.log(error);
+    if (error.code === "LIMIT_UNEXPECTED_FILE") {
+      return res.send("Too many files to upload.");
+    }
+    return res.send(`Error when trying upload many files: ${error}`);
+  }
+})
 router.get("/downloadjobfiles/:name", async (req, res) => {
   const fileName = req.params.name;
   const directoryPath = __basedir + "/../job-uploads/";

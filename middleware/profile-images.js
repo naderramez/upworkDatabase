@@ -27,7 +27,7 @@ let uploadFile = multer({
   storage: storage,
   limits: { fileSize: maxSize },
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpeg|jpg|png)$/)) {
+    if (!file.originalname.match(/\.(jpeg|jpg|png|PNG|JPG|JPEG)$/)) {
       return cb(
         new Error(
           'only upload files with jpg, jpeg, png'
