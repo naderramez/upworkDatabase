@@ -10,7 +10,7 @@ const jobFiles = require("../middleware/job-uploads").files;
 const JobPostUpload = require("../middleware/jobpost-uploads")
   .uploadFilesMiddleware;
 const jobPostFiles = require("../middleware/jobpost-uploads").files;
-const imageUpload = require("../middleware/profile-images").uploadFilesMiddleware;
+const imageUpload = require("../middleware/profile-images").uploadFile;
 const image = require("../middleware/profile-images").image;
 
 //GET ALL JOBS WITH LIKERS AND DISLIKERS STATUS
@@ -179,21 +179,14 @@ router.post("/createjob", async (req, res) => {
     experienceLevel: req.body.experienceLevel,
     visibility: req.body.visibility,
     freelancersNo: req.body.freelancersNo,
-    // talentPreference:req.body.talentPreference,
-    //payType:req.body.payType,
     estimatedBudget: req.body.estimatedBudget,
-    // duration:req.body.duration,
-    // timeRequiremnt:req.body.timeRequiremnt,
     postStatus: 1,
     proposals: {
       proposalsList: [],
       length: 0,
+      hiringLength:0,
       files:[]
-    },
-    hiring: {
-      hiringList: [],
-      length: 0,
-    },
+    }
   });
   try {
     const savedJob = await job.save();
@@ -212,11 +205,9 @@ router.post("/createTitle", async (req, res) => {
     proposals: {
       proposalsList: [],
       length: 0,
-    },
-    hiring: {
-      hiringList: [],
-      length: 0,
-    },
+      hiringLength:0,
+      files:[]
+    }
   });
   try {
     const savedJob = await jobTitle.save();
@@ -485,16 +476,14 @@ router.post("/undislike", async (req, res) => {
   }
 });
 //SAVE IMAGE
-router.post("/saveimage",async (req, res) => {
+router.post("/saveimage",imageUpload.single('upload'),async (req, res) => {
   try {
-    await imageUpload(req, res);
     console.log(req)
-    console.log(req.files);
     console.log("this is image" , image)
     if (req.files.length <= 0) {
       return res.send(`You must select at least 1 file.`);
     }
-    let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:image}});
+    let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:req.file.buffer}});
     console.log("this is image" , image)
     let updateduser = await User.findOne({_id: req.headers.userid});
     console.log(updateduser);
@@ -505,6 +494,31 @@ router.post("/saveimage",async (req, res) => {
       return res.send("Too many files to upload.");
     }
     return res.send(`Error when trying upload many files: ${error}`);
+  }
+})
+//DELETE IMAGE 
+router.delete('/deleteimage', async (req, res) => {
+  try {
+  const user = await User.findById(req.body.id);
+  user.userImage = undefined;
+  user.save()
+  res.send(user)
+  } catch (e) {
+  res.status(400).send(e)
+  }
+})
+//GET IMAGE
+router.get('/getimage/:userId', async (req, res) => {
+  try{
+  const user = await User.findById(req.params.userId)
+  if (!user || !user.userImage) {
+  throw new Error()
+  }
+  //response header, use set
+  res.set('Content-Type', 'image/png')
+  res.send(user.userImage)
+  } catch(e) {
+  res.status(404).send()
   }
 })
  
@@ -730,6 +744,26 @@ router.post('/getoneofmyproposals', async (req, res) => {
     res.json({ message: err.message });
   }
 })
+router.post('/sethiringlength',async (req, res) =>{
+  try {
+    let proposals = await Job.find({},{proposals: 1, _id: 1});
+    for(let i = 0; i < proposals.length; i++){
+      let count = 0;
+      let single = proposals[i].proposals.proposalsList;
+      for(let j = 0; j < single.length; j++){
+        if(single[j].proposal.status == 2){
+          count ++;
+        }
+      }
+      let proposal = {...proposals[i].proposals, hiringLength: count,files:[]};
+      await Job.updateOne({_id: proposals[i]._id},{ $set: { proposals: proposal } })
+    }
+    let newJob  = await Job.find({},{proposals:1});
+    res.send(newJob);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+})
 //HIRING
 router.post("/acceptproposal", async (req, res) => {
   try {
@@ -754,20 +788,15 @@ router.post("/acceptproposal", async (req, res) => {
       { _id: req.body.jobId },
       { $set: { proposals: proposals } }
     );
-    let hiring = await Job.find({ _id: req.body.jobId }, { hiring: 1, _id: 0 });
-    hiring = hiring[0].hiring;
-    if (hiring == null) {
-      hiring.hiringList[0] = proposal;
-    } else {
-      hiring.hiringList.push(proposal);
+    let count = 0;
+    for(let i = 0; i <proposals.proposalsList.length; i++){
+      if(proposals.proposalsList[i].proposal.status == 2){
+        count++;
+      }
     }
-    hiring.length = hiring.hiringList.length;
-    updatedJob = await Job.updateOne(
-      { _id: req.body.jobId },
-      { $set: { hiring: hiring } }
-    );
+    proposals.hiringLength = count;
     let job = await Job.find({ _id: req.body.jobId }, {});
-    if (job[0].freelancersNo == hiring.length) {
+    if (job[0].freelancersNo == proposals.hiringLength) {
       updatedJob = await Job.updateOne(
         { _id: req.body.jobId },
         { $set: { postStatus: 2 } }
@@ -856,13 +885,12 @@ router.post("/resetpayment", async (req, res) => {
 //RECEIVE JOB
 router.post("/receivejob", async (req, res) => {
   try {
-    let job = await Job.find({ _id: req.body.jobid }, {});
+    let job = await Job.find({ _id: req.body.jobId }, {});
     let proposals = await Job.find(
       { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
     );
     let hiringNo = 0;
-    console.log(proposals)
     proposals = proposals[0].proposals;
     for (let i = 0; i < proposals.length; i++) {
       if (proposals.proposalsList[i].userId == req.body.userId) {
@@ -893,7 +921,7 @@ router.post("/receivejob", async (req, res) => {
       }
     );
     await User.updateOne(
-      { _id: req.body.userID },
+      { _id: req.body.userId },
       {
         $set: {
           paymentAccount: freelancerAccount
@@ -908,35 +936,37 @@ router.post("/receivejob", async (req, res) => {
 router.post('/uploadjobfiles',async (req, res)=>{
   try {
     await jobUpload(req, res);
-    let receiveJob = {
-      message: req.headers.message,
-      receivedJobFiles : jobFiles
-    };
-    let proposals = await Job.find(
-      { _id: req.headers.jobid },
-      { proposals: 1, _id: 0 }
-    );
+    console.log("req.headers:",req.headers);
+    console.log("req.files:",req)
+    console.log("req.files:",req.body.file)
     let files = [];
     console.log("jobFiles", jobFiles)
     for(let i = 0; i < jobFiles.length; i++) {
       files[i] = proposalFiles[i]
     }
-    console.log(files)
+    let receiveJob = {
+      message: req.headers.message,
+      receivedJobFiles : files
+    };
+    console.log(receiveJob)
+    let proposals = await Job.find(
+      { _id: req.headers.jobid },
+      { proposals: 1, _id: 0 }
+    );
     proposals = proposals[0].proposals;
-    console.log(proposals)
     for(let i = 0; i < proposals.proposalsList.length; i++) {
-      if(proposals.proposalsList[i].userId == req.headers.userId){
-        proposals.proposalsList[i] = {...proposals.proposalsList[0], receiveJob }
+      if(proposals.proposalsList[i].userId == req.headers.userid){
+        proposals.proposalsList[i] = {...proposals.proposalsList[i], receiveJob }
       }
     }
     const updatedJob = await Job.updateOne(
       { _id: req.headers.jobid },
       { $set: { proposals: proposals } }
     ); 
-    const updated = await Job.findOne({_id: req.headers.jobId})
+    const updated = await Job.findOne({_id: req.headers.jobid})
     res.send(updated);
     
-    res.send(jobFiles);
+    res.send(updated);
   } catch (error) {
     console.log(error);
     if (error.code === "LIMIT_UNEXPECTED_FILE") {

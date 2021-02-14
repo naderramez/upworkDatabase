@@ -35,9 +35,8 @@ let uploadFile = multer({
     }
     cb(undefined, true); // continue with upload
   }
-}).array("file", 10);
+});
 
 
 //var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
-var uploadFilesMiddleware = util.promisify(uploadFile);
-module.exports = {uploadFilesMiddleware, image};
+module.exports = {uploadFile, image};

@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
       type: Object
   },
   userImage:{
-    type:Array
+    type: Buffer
   },
   tokens: [
     {
