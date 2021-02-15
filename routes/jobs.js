@@ -10,8 +10,8 @@ const jobFiles = require("../middleware/job-uploads").files;
 const JobPostUpload = require("../middleware/jobpost-uploads")
   .uploadFilesMiddleware;
 const jobPostFiles = require("../middleware/jobpost-uploads").files;
-const imageUpload = require("../middleware/profile-images").uploadFile;
-const image = require("../middleware/profile-images").image;
+const upload = require("../middleware/profile-images").upload;
+const sharp = require('sharp');
 
 //GET ALL JOBS WITH LIKERS AND DISLIKERS STATUS
 router.post("/getalljobs", async (req, res) => {
@@ -476,14 +476,15 @@ router.post("/undislike", async (req, res) => {
   }
 });
 //SAVE IMAGE
-router.post("/saveimage",imageUpload.single('upload'),async (req, res) => {
+router.post("/saveimage",upload.single('file'),async (req, res) => {
   try {
     console.log(req)
     console.log("this is image" , image)
-    if (req.files.length <= 0) {
-      return res.send(`You must select at least 1 file.`);
-    }
-    let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:req.file.buffer}});
+    // if (req.file) {
+    //   return res.send(`You must select at least 1 file.`);
+    // }
+    const buffer = await sharp(req.file.buffer).resize({ width: 500, height: 500}).png().toBuffer()
+    let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:buffer}});
     console.log("this is image" , image)
     let updateduser = await User.findOne({_id: req.headers.userid});
     console.log(updateduser);
@@ -683,6 +684,7 @@ router.post('/getmyproposals', async (req, res) => {
   try {
     let jobsProposals = await Job.find({},{ proposals: 1, _id: 1});
     let myProposalsJob = [];
+    console.log(req.body)
     for(let i = 0; i < jobsProposals.length; i++) {
       if(jobsProposals[i].proposals.length > 0) {
         for(let j = 0; j < jobsProposals[i].proposals.length; j++){
@@ -744,29 +746,25 @@ router.post('/getoneofmyproposals', async (req, res) => {
     res.json({ message: err.message });
   }
 })
-router.post('/sethiringlength',async (req, res) =>{
-  try {
-    let proposals = await Job.find({},{proposals: 1, _id: 1});
-    for(let i = 0; i < proposals.length; i++){
-      let count = 0;
-      let single = proposals[i].proposals.proposalsList;
-      for(let j = 0; j < single.length; j++){
-        if(single[j].proposal.status == 2){
-          count ++;
-        }
-      }
-      let proposal = {...proposals[i].proposals, hiringLength: count,files:[]};
-      await Job.updateOne({_id: proposals[i]._id},{ $set: { proposals: proposal } })
-    }
-    let newJob  = await Job.find({},{proposals:1});
-    res.send(newJob);
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-})
 //HIRING
 router.post("/acceptproposal", async (req, res) => {
   try {
+    ///////////PAYMENT///////////
+    let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
+    let clientAccount = client.paymentAccount;
+    if(clientAccount.totalAmount < job[0].proposals.proposalsList[proposalNo].proposal.terms.bid){
+      res.send("Your payment account is less than bid")
+    }
+    clientAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.bid;
+    clientAccount.availableAmount -= clientAccount.holdAmount;
+    console.log(clientAccount);
+    let freelancer = await User.findOne({_id: req.body.userId},{paymentAccount:1,_id:0});
+    let freelancerAccount = freelancer.paymentAccount;
+    freelancerAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
+    freelancerAccount.totalAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
+    freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
+    await User.updateOne({ _id: job[0].clientId },{$set: {paymentAccount: clientAccount},});
+    await User.updateOne({ _id: req.body.userId },{$set: {paymentAccount: freelancerAccount},});
     let proposals = await Job.find(
       { _id: req.body.jobId },
       { proposals: 1, _id: 0 }
@@ -776,12 +774,9 @@ router.post("/acceptproposal", async (req, res) => {
     let proposal;
     for (let i = 0; i < proposals.proposalsList.length; i++) {
       if (proposals.proposalsList[i].userId == req.body.userId) {
-        proposals.proposalsList[i].proposal.status = 2; //hired
+        proposals.proposalsList[i].proposal.status = 2; 
         proposal = proposals.proposalsList[i];
         proposalNo = i;
-      }
-      else{
-        proposals.proposalsList[i].proposal.status = -1;
       }
     }
     let updatedJob = await Job.updateOne(
@@ -795,88 +790,57 @@ router.post("/acceptproposal", async (req, res) => {
       }
     }
     proposals.hiringLength = count;
+    console.log(proposals)
     let job = await Job.find({ _id: req.body.jobId }, {});
-    if (job[0].freelancersNo == proposals.hiringLength) {
+    if (job[0].freelancersNo == count) {
       updatedJob = await Job.updateOne(
         { _id: req.body.jobId },
         { $set: { postStatus: 2 } }
       ); //finished
       for (let i = 0; i < proposals.proposalsList.length; i++) {
         if (proposals.proposalsList[i].proposal.status == 0) {
-          proposals.proposalsList[i].proposal.status = 3; //job not assigned to it
-          updatedJob = await Job.updateOne(
-            { _id: req.body.jobId },
-            { $set: { proposals: proposals } }
-          );
+          proposals.proposalsList[i].proposal.status = -1; 
         }
       }
     }
-    let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
-    let clientAccount = client.paymentAccount;
-    if(clientAccount.totalAmount < job[0].proposals.proposalsList[proposalNo].proposal.terms.bid){
-      res.send("Your payment account is less than bid")
-    }
-    clientAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.bid;
-    clientAccount.availableAmount = clientAccount.totalAmount-clientAccount.holdAmount;
-    console.log(clientAccount);
-    let freelancer = await User.findOne({_id: req.body.userId},{paymentAccount:1,_id:0});
-    let freelancerAccount = freelancer.paymentAccount;
-    freelancerAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
-    freelancerAccount.totalAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
-    freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
-    await User.updateOne(
-      { _id: job[0].clientId },
-      {
-        $set: {
-          paymentAccount: clientAccount
-        },
-      }
-    );
-    await User.updateOne(
-      { _id: req.body.userId },
-      {
-        $set: {
-          paymentAccount: freelancerAccount
-        },
-      }
-    );
+    updatedJob = await Job.updateOne({ _id: req.body.jobId },{ $set: { proposals: proposals } });
     res.json(updatedJob);
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-});
-//DELETE ALL HIRINGS
-router.post("/deletehirings", async (req, res) => {
-  try {
-    let hiring = {
-      hiringList: [],
-      length: 0,
-    };
-    const updatedJob = await Job.updateOne(
-      { _id: req.body.jobId },
-      { $set: { hiring: hiring } }
-    );
-    res.json(updatedJob);
-    hiring;
   } catch (err) {
     res.json({ message: err.message });
   }
 });
 router.post("/resetpayment", async (req, res) => {
   try {
-    let payment = {
+    let clientPayment = {
       totalAmount:5000,
+      holdAmount:0,
+      availableAmount:5000
+    }
+    let freelancerPayment = {
+      totalAmount:0,
       holdAmount:0,
       availableAmount:0
     }
-    const user = await User.updateOne(
-      { _id: req.body.userId },
-      {
-        $set: {
-          paymentAccount: payment
-        },
+    let user= await User.find({});
+    console.log(user)
+    for(let i = 0; i < user.length; i++){
+      if(user[i].paymentAccount){
+
+      if(user[i].type == "freelancer"){
+        await User.updateOne(
+          { _id: user[i]._id},
+          {
+            $set: {
+              paymentAccount: freelancerPayment
+            },
+          }
+        );
       }
-    );
+      else{
+        await User.updateOne({ _id: user[i]._id},{$set: {paymentAccount: clientPayment},});
+      }
+    }
+  }
     res.json(user)
   } catch (err) {
     res.json({ message: err.message });
@@ -886,10 +850,7 @@ router.post("/resetpayment", async (req, res) => {
 router.post("/receivejob", async (req, res) => {
   try {
     let job = await Job.find({ _id: req.body.jobId }, {});
-    let proposals = await Job.find(
-      { _id: req.body.jobId },
-      { proposals: 1, _id: 0 }
-    );
+    let proposals = await Job.find({ _id: req.body.jobId },{ proposals: 1, _id: 0 });
     let hiringNo = 0;
     proposals = proposals[0].proposals;
     for (let i = 0; i < proposals.length; i++) {
@@ -898,36 +859,20 @@ router.post("/receivejob", async (req, res) => {
         hiringNo = i;
       }
     }
-    updatedJob = await Job.updateOne(
-      { _id: req.body.jobId },
-      { $set: { proposals: proposals } }
-    ); //finished
+    updatedJob = await Job.updateOne({ _id: req.body.jobId },{ $set: { proposals: proposals } }); 
+    ///////////PAYMENT///////////
     let sendedJob = await Job.findOne({ _id: req.body.jobId});
-    let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
-    let clientAccount = client.paymentAccount;
-    clientAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
-    clientAccount.totalAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
-    let freelancer = await User.findOne({_id: req.headers.userid},{paymentAccount:1,_id:0});
-    let freelancerAccount = freelancer.paymentAccount;
-    freelancerAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
-    freelancerAccount.totalAmount += job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
-    freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
-    await User.updateOne(
-      { _id: job[0].clientId },
-      {
-        $set: {
-          paymentAccount: clientAccount
-        },
-      }
-    );
-    await User.updateOne(
-      { _id: req.body.userId },
-      {
-        $set: {
-          paymentAccount: freelancerAccount
-        },
-      }
-    );
+    // let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
+    // let clientAccount = client.paymentAccount;
+    // clientAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
+    // clientAccount.totalAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
+    // let freelancer = await User.findOne({_id: req.headers.userid},{paymentAccount:1,_id:0});
+    // let freelancerAccount = freelancer.paymentAccount;
+    // freelancerAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
+    // freelancerAccount.totalAmount += job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
+    // freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
+    // await User.updateOne({ _id: job[0].clientId },{$set: {paymentAccount: clientAccount},});
+    // await User.updateOne({ _id: req.body.userId },{$set: {paymentAccount: freelancerAccount},});
     res.json(sendedJob);
   } catch (err) {
     res.json({ message: err.message });
@@ -937,36 +882,41 @@ router.post('/uploadjobfiles',async (req, res)=>{
   try {
     await jobUpload(req, res);
     console.log("req.headers:",req.headers);
-    console.log("req.files:",req)
-    console.log("req.files:",req.body.file)
+    console.log("req.files:",req.files)
+    console.log("req.body.files:",req.body.file)
     let files = [];
-    console.log("jobFiles", jobFiles)
+    console.log("jobFilesssssssssssssss", jobFiles)
     for(let i = 0; i < jobFiles.length; i++) {
       files[i] = proposalFiles[i]
     }
-    let receiveJob = {
+    let receivedJob = {
       message: req.headers.message,
-      receivedJobFiles : files
+      receivedJobFiles : jobFiles
     };
-    console.log(receiveJob)
+    console.log(receivedJob)
     let proposals = await Job.find(
       { _id: req.headers.jobid },
       { proposals: 1, _id: 0 }
     );
     proposals = proposals[0].proposals;
+    let hiringNo = 0;
     for(let i = 0; i < proposals.proposalsList.length; i++) {
       if(proposals.proposalsList[i].userId == req.headers.userid){
-        proposals.proposalsList[i] = {...proposals.proposalsList[i], receiveJob }
+        proposals.proposalsList[i] = {...proposals.proposalsList[i], receivedJob: receivedJob }
+        proposals.proposalsList[i].proposal.status = 3; //job finished
+        hiringNo = i;
       }
     }
-    const updatedJob = await Job.updateOne(
+    console.log("proposals::::::::::::::::::::::::::::",proposals)
+    await Job.updateOne(
       { _id: req.headers.jobid },
       { $set: { proposals: proposals } }
     ); 
-    const updated = await Job.findOne({_id: req.headers.jobid})
-    res.send(updated);
+    // const updated = await Job.findOne({_id: req.headers.jobid})
     
-    res.send(updated);
+    ///////////PAYMENT///////////
+    let sendedJob = await Job.findOne({ _id: req.headers.jobid});
+    res.send(sendedJob);   
   } catch (error) {
     console.log(error);
     if (error.code === "LIMIT_UNEXPECTED_FILE") {
