@@ -21,7 +21,6 @@ const registerAuthRouter = require('./routes/register-auth');
 const jobRoute = require('./routes/jobs').router;
 
 
-
 //app.listen(8080);
 //const signinAuthRouter = require('./routes/signin-auth');
 const profile = require('./routes/profile');

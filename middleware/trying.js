@@ -1,21 +1,20 @@
 const util = require("util");
 const path = require("path");
 const multer = require("multer");
-const maxSize = 5 * 1024 * 1024 * 1024;
-let files = [];
+const maxSize = 7 * 1024 * 1024 * 1024;
 
+let files = [];
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(`${__dirname}/../jobpost-uploads`));
+    callback(null, path.join(`${__dirname}/../job-uploads`));
   },
   filename: (req, file, callback) => {
     if(req.files.length === 1){
       files.splice(0, files.length);
     }
-    const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-powerpoint"];
-
+    const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.ms-powerpoint"];
     if (match.indexOf(file.mimetype) === -1) {
-      var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
+      var message = `${file.originalname} is invalid. Only accept png/jpeg/gif/txt/html/js/css/pdf/docx/xls/ppt.`;
       return callback(message, null);}
     console.log(file.originalname);
     console.log(file);
@@ -23,10 +22,9 @@ var storage = multer.diskStorage({
     callback(null, fileName);
     console.log(fileName)
     files.push(fileName)
-    console.log(files)
+    console.log("files in middleware",files)
   }
 });
-
 let uploadFile = multer({
   storage: storage,
   limits: { fileSize: maxSize },
@@ -40,9 +38,6 @@ let uploadFile = multer({
     }
     cb(undefined, true); // continue with upload
   }
-}).array("file", 10);
-
-
-//var uploadFiles = multer({ storage: storage }).array("multi-files", 10);
+}).array("files", 10);
 var uploadFilesMiddleware = util.promisify(uploadFile);
 module.exports = {uploadFilesMiddleware, files};
