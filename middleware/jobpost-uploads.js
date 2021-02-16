@@ -9,6 +9,9 @@ var storage = multer.diskStorage({
     callback(null, path.join(`${__dirname}/../jobpost-uploads`));
   },
   filename: (req, file, callback) => {
+    if(req.files.length === 1){
+      files.splice(0, files.length);
+    }
     const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-powerpoint"];
 
     if (match.indexOf(file.mimetype) === -1) {
@@ -16,9 +19,10 @@ var storage = multer.diskStorage({
       return callback(message, null);}
     console.log(file.originalname);
     console.log(file);
-    callback(null, `${new Date().getTime()}_${file.originalname}`);
-    console.log(`${new Date().getTime()}_${file.originalname}`)
-    files.push(`${new Date().getTime()}_${file.originalname}`)
+    let fileName = `${new Date().getTime()}_${file.originalname}`
+    callback(null, fileName);
+    console.log(fileName)
+    files.push(fileName)
     console.log(files)
   }
 });
