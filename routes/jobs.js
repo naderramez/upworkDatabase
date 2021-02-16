@@ -479,13 +479,13 @@ router.post("/undislike", async (req, res) => {
 router.post("/saveimage",upload.single('file'),async (req, res) => {
   try {
     console.log(req)
-    console.log("this is image" , image)
+    // console.log("this is image" , image)
     // if (req.file) {
     //   return res.send(`You must select at least 1 file.`);
     // }
     const buffer = await sharp(req.file.buffer).resize({ width: 500, height: 500}).png().toBuffer()
     let user = await User.updateOne({_id:req.headers.userid},{$set:{userImage:buffer}});
-    console.log("this is image" , image)
+    // console.log("this is image" , image)
     let updateduser = await User.findOne({_id: req.headers.userid});
     console.log(updateduser);
     return res.send(updateduser);
