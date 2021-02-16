@@ -804,7 +804,6 @@ router.post("/acceptproposal", async (req, res) => {
     let freelancer = await User.findOne({_id: req.body.userId},{paymentAccount:1,_id:0});
     let freelancerAccount = freelancer.paymentAccount;
     freelancerAccount.holdAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
-    freelancerAccount.totalAmount += job[0].proposals.proposalsList[proposalNo].proposal.terms.received;
     freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
     await User.updateOne({ _id: job[0].clientId },{$set: {paymentAccount: clientAccount},});
     await User.updateOne({ _id: req.body.userId },{$set: {paymentAccount: freelancerAccount},});
@@ -887,20 +886,21 @@ router.post('/uploadjobfiles',async (req, res)=>{
   try {
       await jobUpload(req, res);
       console.log("files in upload job", jobFiles)
-      console.log("req files", req.files)
-    //  let readFiles = [];
-    //   for(let i=0; i<req.files.length; i++){
-    //     let read = fs.createReadStream(req.files[i].path)
-    //     let buffer;
-    //     read.on('data', (data)=>{
-    //         buffer = data;
-    //       console.log("data", data)
-    //     })
-    //     let file = await new File ({
-    //       data:  buffer,
-    //       type: req.files[i].mimetype,
-    //       filename: jobFiles[i]
-    //   })
+      console.log("job files", jobFiles)
+     let readFiles = [];
+      for(let i=0; i<req.files.length; i++){
+        let read = fs.createReadStream(req.files[i].path)
+        let buffer;
+        read.on('data', (data)=>{
+            buffer = data;
+          console.log("data", data)
+        })
+        let file = await new File ({
+          data:  buffer,
+          type: req.files[i].mimetype,
+          filename: jobFiles[i]
+      })
+    }
     //   console.log(jobFiles[i])
     //   let savedFile = await file.save();
     //   console.log(savedFile)
@@ -937,20 +937,22 @@ router.post('/uploadjobfiles',async (req, res)=>{
       { $set: { proposals: proposals } }
     ); 
     // const updated = await Job.findOne({_id: req.headers.jobid})
-    let sendedJob = await Job.findOne({ _id: req.headers.jobid});
+    let job = await Job.findOne({ _id: req.headers.jobid});
+    console.log(job)
     //PAYMENT
-    let client = await User.findOne({_id: job[0].clientId},{paymentAccount:1,_id:0});
+    let client = await User.findOne({_id: job.clientId},{paymentAccount:1,_id:0});
     let clientAccount = client.paymentAccount;
-    clientAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
-    clientAccount.totalAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.bid;
+    clientAccount.holdAmount -= job.proposals.proposalsList[hiringNo].proposal.terms.bid;
+    clientAccount.totalAmount -= job.proposals.proposalsList[hiringNo].proposal.terms.bid;
     let freelancer = await User.findOne({_id: req.headers.userid},{paymentAccount:1,_id:0});
     let freelancerAccount = freelancer.paymentAccount;
-    freelancerAccount.holdAmount -= job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
-    freelancerAccount.totalAmount += job[0].proposals.proposalsList[hiringNo].proposal.terms.received;
+    freelancerAccount.holdAmount -= job.proposals.proposalsList[hiringNo].proposal.terms.received;
+    freelancerAccount.totalAmount += job.proposals.proposalsList[hiringNo].proposal.terms.received;
     freelancerAccount.availableAmount = Math.abs(freelancerAccount.totalAmount - freelancerAccount.holdAmount);
-    await User.updateOne({ _id: job[0].clientId },{$set: {paymentAccount: clientAccount},});
-    await User.updateOne({ _id: req.body.userId },{$set: {paymentAccount: freelancerAccount},});
-    res.send(sendedJob);   
+    await User.updateOne({ _id: job.clientId },{$set: {paymentAccount: clientAccount},});
+    await User.updateOne({ _id: req.headers.userid },{$set: {paymentAccount: freelancerAccount},});
+    console.log()
+    res.send(job);   
   } catch (error) {
     console.log(error);
     if (error.code === "LIMIT_UNEXPECTED_FILE") {
