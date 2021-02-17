@@ -197,6 +197,27 @@ router.post("/createjob", async (req, res) => {
         files:[]
       }
     });
+    if(req.files){
+      for(let i=0; i<req.files.length; i++){
+        let read = fs.createReadStream(req.files[i].path)
+        let buffer;
+        read.on('data', async (data)=>{
+          count++;
+          if(count != i+1){
+            return
+          }
+          theFiles = jobPostFiles[i];
+          buffer = data;
+          const newFile = await {
+            data:  buffer,
+            fileName: theFiles,
+            type: req.files[i].mimetype
+          }
+          let file = new File(newFile)
+          file.save();
+        })
+      }
+    }
     const savedJob = await job.save();
     res.send(savedJob);
     consolr.log(savedJob);
@@ -570,6 +591,27 @@ router.post('/uploadproposlsfiles', async (req, res)=>{
     await proposalUpload(req, res);
     console.log("files in controllers",proposalFiles);
     console.log("req.body",req.body);
+    if(req.files){
+      for(let i=0; i<req.files.length; i++){
+        let read = fs.createReadStream(req.files[i].path)
+        let buffer;
+        read.on('data', async (data)=>{
+          count++;
+          if(count != i+1){
+            return
+          }
+          theFiles = proposalFiles[i];
+          buffer = data;
+          const newFile = await {
+            data:  buffer,
+            fileName: theFiles,
+            type: req.files[i].mimetype
+          }
+          let file = new File(newFile)
+          file.save();
+        })
+      }
+    }
     console.log(req.headers)
     let proposals = await Job.find(
       { _id: req.headers.jobid },
@@ -884,36 +926,33 @@ router.post("/receivejob", async (req, res) => {
 });
 router.post('/uploadjobfiles',async (req, res)=>{
   try {
+    
       await jobUpload(req, res);
       console.log("files in upload job", jobFiles)
       console.log("job files", jobFiles)
-     let readFiles = [];
+    let count = 0;
       for(let i=0; i<req.files.length; i++){
         let read = fs.createReadStream(req.files[i].path)
         let buffer;
-        read.on('data', (data)=>{
-            buffer = data;
-          console.log("data", data)
+        console.log("i before", i)
+        read.on('data', async (data)=>{
+          count++;
+          console.log("count", count)
+          console.log("i", i)
+          if(count != i+1){
+            return
+          }
+          theFiles = jobFiles[i];
+          buffer = data;
+          const newFile = await {
+            data:  buffer,
+            fileName: theFiles,
+            type: req.files[i].mimetype
+          }
+          let file = new File(newFile)
+          file.save();
         })
-        let file = await new File ({
-          data:  buffer,
-          type: req.files[i].mimetype,
-          filename: jobFiles[i]
-      })
     }
-    //   console.log(jobFiles[i])
-    //   let savedFile = await file.save();
-    //   console.log(savedFile)
-    // }
-    // console.log(readFiles)
-    // let files = [];
-    // let filesNames = [];
-    // for(let i=0; i<req.files.length; i++){
-    //   filesNames.push(req.files[i].originalname);
-    // }
-    // for(let i = 0; i < jobFiles.length; i++) {
-    //   files[i] = jobFiles[i]
-    // }
     let receivedJob = {
       message: req.headers.message,
       receivedJobFiles : jobFiles
@@ -923,6 +962,7 @@ router.post('/uploadjobfiles',async (req, res)=>{
       { _id: req.headers.jobid },
       { proposals: 1, _id: 0 }
     );
+    console.log("pro", proposals)
     proposals = proposals[0].proposals;
     let hiringNo = 0;
     for(let i = 0; i < proposals.proposalsList.length; i++) {
@@ -938,7 +978,6 @@ router.post('/uploadjobfiles',async (req, res)=>{
     ); 
     // const updated = await Job.findOne({_id: req.headers.jobid})
     let job = await Job.findOne({ _id: req.headers.jobid});
-    console.log(job)
     //PAYMENT
     let client = await User.findOne({_id: job.clientId},{paymentAccount:1,_id:0});
     let clientAccount = client.paymentAccount;
@@ -974,6 +1013,24 @@ router.get("/downloadjobfiles/:name", async (req, res) => {
     }
   });
 });
+router.get("/downloadfiles/:name",async (req, res)=>{
+  const fileName = req.params.name;
+  const file = await File.findOne({fileName: fileName});
+  console.log(file)
+  res.set('Content-Type', file.type);
+  var fileContents = Buffer.from(file.data, 'base64');
+  fs.writeFile('/Downloads', fileContents, function() {
+    res.set('Content-Type', file.type);
+    res.download('/Downloads', fileName, (err) => {
+      if (err) {
+        res.status(500).send({
+          message: "Could not download the file. " + err,
+        });
+      }
+    });
+  })
+  //res.send(fileContents)
+})
 
 
 module.exports = { router };

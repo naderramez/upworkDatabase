@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const fileSchema = new mongoose.Schema({
     data:{
-        type: String,
+        type: Buffer,
     },
     type: {
         type: String
