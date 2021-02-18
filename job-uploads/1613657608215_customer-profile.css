@@ -1,0 +1,423 @@
+body{
+    padding: 0;
+    margin: 0;
+    font-family: 'Acme', sans-serif; 
+    background-color: #ddd;
+    overflow-y: scroll;
+    position: relative;
+}
+/*/////////////////////scrollbar//////////////////////*/
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+.col-sm-10{
+    position: absolute;
+    left: 0;
+}
+/* ////////////////////////Upbutton//////////////////////// */
+.upButton{
+    position: fixed;
+    bottom: 13px;
+    right: 30px;
+    z-index: 9999900;
+    display: none;
+}
+/*/////////////////////////////////navbar///////////////////////////////*/
+.navbar{
+    background-color: #2C566A;
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5);
+    z-index: 200000;
+}
+.nav-link{
+    color: #fff;    
+}
+.navbar .image{
+    height: 40px;
+    width: 40px;
+    overflow: hidden;
+    border-radius: 50px;
+    position: relative;
+}
+.navbar .image img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+}
+.container,.row{
+    padding: 0;
+    margin: 0;
+}
+ul{
+    list-style-type: none;
+}
+.category-filter{
+    background-color: #fff;
+}
+
+.colorRed{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #FF6C54;
+}
+.colorBlue{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #548BFF;
+}
+.colorYellow{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #FFF454;
+}
+.colorGreen{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #69E84D;
+}
+.colorPurple{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #EB28DB;
+}
+.colorBlack{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: black;
+}
+.colorWhite{
+    width:35px;
+    height: 30px;    
+    border: none;
+    border-radius: 100px;
+    background-color: #65E2FF;
+}
+.colorGray{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: gray;
+}
+.designer-photo{
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border: none;
+    border-radius: 50%;
+    float: left;
+}
+.designer-photo img{
+    width: 100%;
+    height: 100%; 
+}
+.info-head h5{
+    color: #888;
+}
+.info-head span{
+    font-size: 15px!important;
+}
+.colors p, .colors span{
+    font-size: 15px!important;
+}
+.big-image .img-big{
+    height: 400px;
+    overflow:hidden;
+}
+.small-images{
+    overflow-x: scroll;
+}
+.small-image .img-small{
+    height: 120px;
+    width: 100px;
+    overflow:hidden;
+    display: inline-block;
+    margin-left: 10px;
+}
+.big-image .img-big img,small-image .img-small img{
+    width: 100%;
+    height: 100%;
+}
+.big-image{
+    position: relative;
+    transition: all 1.5s;
+}
+.next, .prev{
+    position: absolute;
+    top: 45%;
+    display: none;
+    transition: all 1.5s;
+}  
+.next{
+    right: 0;
+    cursor: pointer;
+}
+.prev{
+    left: 0;
+    cursor: pointer;
+}
+.big-image:hover .next,.big-image:hover .prev{
+    display: block;
+}
+/*////////////////////////////////////////////Post images//////////////////////////////////////////////*/
+.big-image{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+.big-image img{
+    width: 100%;
+    height: 100%;
+}
+.small-image{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+.small-image img{
+    width: 100%;
+    height: 100%;
+}
+.post-info p,.post-info span{
+    font-size:19px;
+}
+.reaction{
+    margin: 0px;
+    text-align: center;
+}
+.num-react{
+}
+.customer-react{
+    background-color: transparent;
+    border: 1px solid #333;
+    height: 100%;
+    width: 100%;
+}
+/**********************************************Message Side***********************************************/
+.messages-side{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 16.7%;
+    background-color: #fff;
+    overflow-y: scroll;
+}
+#contacts{
+    width: 100%;
+}
+ #contacts .contact {
+     width: 100%;    
+     cursor: pointer;
+     transition: all 1s;
+}
+/* wrap customers images */
+#contacts .contact .image-status{
+    position: relative;
+    float: left;
+    margin-right: 15px;
+}
+#contacts .contact .image{
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 100%;
+    overflow: hidden;
+}
+#contacts .contact .image img {
+    width: 100%;
+    height: 100%;
+}
+#contacts .contact .image-status .contact-status {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #D7D5D5;!important /* circle of border */
+    background: #95a5a6;!important
+    z-index: 50
+    }
+/*statues colors*/
+#contacts .contact .image-status .online {
+    background: #2ecc71;
+}
+#contacts .contact .busy {
+    background: #e74c3c;
+}
+#contacts .contact .contact-info{
+    margin-left: 20px;
+    color: #000;
+}
+#contacts .contact .name {
+    font-weight: 500;
+    font-size: 17px;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+ /* ////////////////////////footer///////////////////////// */
+.footer-area {
+    background: #333333 none repeat scroll 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100px;
+  }
+  .copy-right {
+    color: #ffffff;
+    margin: 0;
+  }
+  .copy-right a{
+    color: #ff305b;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+  }
+  .copy-right a:hover{
+    text-decoration: none;
+  }
+  .accounts .account{
+    border-radius: 100%;
+    background-color: #09c;
+}
+.accounts .facebook{
+    background-color: transparent;
+    color: #4267B2;
+}
+.accounts .twitter{
+    background-color: transparent;
+    color: #1DA1F2;
+}
+.accounts .instagram{
+    background-color: transparent;
+    color: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+}
+.fa-facebook-f{
+    color: #4267B2;
+}
+.fa-twitter{
+    color: #1DA1F2;
+}
+.fa-instagram{
+  position: relative;
+  width: 36px;
+  border-radius: 20%;
+  background: radial-gradient(circle at 33% 100%, #fed373 4%, #f15245 30%, #d92e7f 62%, #9b36b7 85%, #515ecf)
+}
+.fa-instagram:after,
+.fa-instagram:before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25px;
+  border: 2px solid #fff;
+  transform: translate(-50%, -50%);
+  content: ''
+}
+.fa-instagram:before {
+  border-radius: 20%
+}
+.fa-instagram:after {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%
+}
+/*/////////////modal//////////*/
+.modal{
+    z-index: 100000000;
+}
+.modal #close{
+    position: absolute;
+    cursor: pointer;
+    top: 10px;
+    right: 10px;
+}
+.modal .image-cart{
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.modal .image-cart img{
+    width: 100%;
+    height: 100%;
+}
+.small-info,.medium-info,.large-info,.xlarge-info,.xxlarge-info,.moresize-info{
+    display: none;
+}
+.small-red-num,.small-blue-num,.small-yellow-num,.small-green-num,.small-purple-num,.small-black-num,.small-white-num,.small-gray-num,
+.medium-red-num,.medium-blue-num,.medium-yellow-num,.medium-green-num,.medium-purple-num,.medium-black-num,.medium-white-num,.medium-gray-num,
+.medium-red-num,.small-blue-num,.small-yellow-num,.small-green-num,.small-purple-num,.small-black-num,.small-white-num,.small-gray-num,
+.large-red-num,.large-blue-num,.large-yellow-num,.large-green-num,.large-purple-num,.large-black-num,.large-white-num,.large-gray-num,
+.xlarge-red-num,.xlarge-blue-num,.xlarge-yellow-num,.xlarge-green-num,.xlarge-purple-num,.xlarge-black-num,.xlarge-white-num,.xlarge-gray-num,
+.xxlarge-red-num,.xxlarge-blue-num,.xxlarge-yellow-num,.xxlarge-green-num,.xxlarge-purple-num,.xxlarge-black-num,.xxlarge-white-num,.xxlarge-gray-num,
+.more-red-num,.more-blue-num,.more-yellow-num,.more-green-num,.more-purple-num,.more-black-num,.more-white-num,.more-gray-num
+{
+    display: none;
+}
+
+.settings-btn, .log-out{
+    cursor: pointer;
+}
+/*settings modal*/
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.image-show{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+#img-upload{
+    width: 100%;
+    height: 100%;
+}

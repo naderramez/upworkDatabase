@@ -22,7 +22,6 @@ router.post("/getalljobs", async (req, res) => {
     var allJobsData = [];
     for(let j of jobs){
       let status = 0;
-      console.log(j)
       var user = await User.findOne({_id:j.clientId},{country:1,_id:0})
       for (var i = 0; i < j.likers.length; i++) {
         if (j.likers[i] == req.body.userId) {
@@ -37,7 +36,6 @@ router.post("/getalljobs", async (req, res) => {
           reason = j.dislikers[i].reason;
         }
       }
-      console.log(user)
       if(reason){
         j = {...j._doc, clientCountry:user.country, status:status, reason:reason}
       }
@@ -196,30 +194,8 @@ router.post("/createjob", async (req, res) => {
         files:[]
       }
     });
-    if(req.files){
-      for(let i=0; i<req.files.length; i++){
-        let read = fs.createReadStream(req.files[i].path)
-        let buffer;
-        read.on('data', async (data)=>{
-          count++;
-          if(count != i+1){
-            return
-          }
-          theFiles = jobPostFiles[i];
-          buffer = data;
-          const newFile = await {
-            data:  buffer,
-            fileName: theFiles,
-            type: req.files[i].mimetype
-          }
-          let file = new File(newFile)
-          file.save();
-        })
-      }
-    }
     const savedJob = await job.save();
     res.send(savedJob);
-    consolr.log(savedJob);
   } catch (err) {
     res.status(400).send(err);
   }
@@ -1018,9 +994,9 @@ router.get("/downloadfiles/:name",async (req, res)=>{
   console.log(file)
   res.set('Content-Type', file.type);
   var fileContents = Buffer.from(file.data, 'base64');
-  fs.writeFile('/Downloads', fileContents, function() {
+  fs.writeFile('Downloads', fileContents, function() {
     res.set('Content-Type', file.type);
-    res.download('/Downloads', fileName, (err) => {
+    res.download('Downloads', fileName, (err) => {
       if (err) {
         res.status(500).send({
           message: "Could not download the file. " + err,

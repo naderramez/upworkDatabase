@@ -9,13 +9,15 @@ var storage = multer.diskStorage({
     callback(null, path.join(`${__dirname}/../proposals-uploads`));
   },
   filename: (req, file, callback) => {
-    if(req.files.length === 1){
-      files.splice(0, files.length);
-    }
     const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.ms-powerpoint","application/zip","application/xml","application/typescript"];
     if (match.indexOf(file.mimetype) === -1) {
       var message = `${file.originalname} is invalid. Only accept png/jpeg/gif/txt/html/js/css/pdf/docx/xls/ppt.`;
       return callback(message, null);}
+      if(req.files.length === 1){
+        console.log("2rga3 b2a")
+        files.splice(0, );
+        console.log("2rgaaaaa3",files);
+      }
     console.log(file.originalname);
     console.log(file);
     let fileName = `${new Date().getTime()}_${file.originalname}`
