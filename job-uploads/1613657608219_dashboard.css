@@ -1,0 +1,66 @@
+body{
+    padding: 0;
+    margin: 0;
+    font-family: 'Acme', sans-serif; 
+    background-color: #eee;
+    overflow-y: scroll;
+    position: relative;
+}
+/*/////////////////////scrollbar//////////////////////*/
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+/* ////////////////////////Upbutton//////////////////////// */
+.upButton{
+    position: fixed;
+    bottom: 13px;
+    right: 30px;
+    z-index: 9999900;
+    display: none;
+}
+/*/////////////////////////////////navbar///////////////////////////////*/
+.nav1{
+    background-color: #2C566A;
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5);
+}
+.dashboard-word{
+    font-size: 50px;
+    font-family: 'Kavivanar';
+}
+.log-out{
+    font-size: 18px;
+}
+
+.nav2 {
+    background-color: transparent;
+    z-index:3000;
+}
+.nav2 .navbar .nav-item .nav-link{
+    color:#333;
+    font-weight: 700;
+    font-size: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: none;
+    transition: all 0.5s;
+}
+.nav2 .navbar .nav-item .nav-link:hover{
+    color: #2C566A;
+    border-bottom: 3px solid #2C566A; 
+}

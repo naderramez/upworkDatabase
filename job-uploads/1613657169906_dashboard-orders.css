@@ -1,0 +1,267 @@
+.nav2 .navbar .nav-item .orders{
+    color: #2C566A;
+    border-bottom: 3px solid #2C566A; 
+}
+/**********************************************/
+.nav3 {
+    background-color: transparent;
+    z-index:3000;
+}
+.nav3 .navbar .nav-item .nav-link{
+    color:#333;
+    font-family: 'Kavivanar';
+    font-size: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: none;
+    transition: all 0.5s;
+}
+.nav3 .navbar .nav-item .nav-link:hover{
+    color: #2C566A;
+    border-bottom: 3px solid #2C566A; 
+}
+.nav3 .navbar .nav-item .curr{
+    border-bottom: 3px solid #000; 
+}
+.head-name{
+    font-size: 16px;
+    color: #000;
+}
+.current,.finished{
+    position: relative;
+}
+.finished{
+    display: none;
+}
+.current::before,.finished::before{
+    position: absolute;
+    content: "";
+    background: linear-gradient(70deg,#0ebeff,#ffdd40,#ae63e4,#47cf73);
+    width: 100%;
+    height: 4px;
+    top: 100%;
+    left: 0%;
+}
+.current::before{
+    position: absolute;
+    content: "";
+    background: linear-gradient(70deg,#0ebeff,#ffdd40,#ae63e4,#47cf73);
+    width: 100%;
+    height: 4px;
+    top: 100%;
+    left: 0%;
+}
+.order{
+    background-color: #ddd;
+}
+.order .image{
+    height: 80px;
+    width: 80px;
+    border-radius: 100%;
+    overflow: hidden;
+    display: inline-block;
+}
+.order .image img{
+    height: 100%;
+    width: 100%;
+}
+.order .order-type{
+    display: inline-block;
+}
+.order .order-type p{
+    font-size: 19px;
+    color: #333;
+}
+.ord{
+    height: 100%;
+    width: 100%;
+}
+.butn .btn{
+    font-size: 20px;    
+}
+.table-striped{
+    text-align: center;
+}
+.colorRed{
+    width:35px;
+    height: 30px;
+    border: none;
+    border-radius: 100px;
+    background-color: #FF6C54;
+}
+.big-image{
+    height: 500px;
+    width: 100%;
+    overflow: hidden;
+}
+.big-image .main-img{
+    height: 100%;
+    width: 100%;
+} 
+.modal-content #close{
+    position: absolute;
+    z-index: 30;
+    cursor: pointer;
+    top: 10px;
+    right: 10px;
+}
+.buttons{
+    text-align: center;
+}
+.close-btn{
+    background-color: #2C566A;
+    border: none;
+    font-size: 25px;
+    transition: all 1s
+}
+.sub-image{
+    margin-top: 15px;
+}
+.modal .prod-info p,.modal span{
+    display: inline-block;
+    font-weight: 900;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+.modal .prod-info span{
+    margin-left: 7px;
+    font-weight: 600;
+}
+.modal .prod-color{
+    margin-left: 10px;
+}
+.progression .progression-bar{
+    position: relative;
+    border: 2px solid #000;
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    height: 29px;
+    border-radius: 100px;
+}
+.finished .progression .progression-bar::after{
+    position: absolute;
+    content: "Finished";
+    background-color: #28a745;
+    border-radius: 100px;
+    width: 100%;
+    height: 25px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.current .progression .progression-bar{
+    position: relative;
+}
+.progression .bar1{
+    position: absolute;
+    background-color: #2C566A;
+    border-radius: 100px;
+    width: 20%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+.progression .bar2{
+    position: absolute;
+    background-color: #2C566A;
+    border-radius: 100px;
+    width: 50%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+.progression .bar3{
+    position: absolute;
+    background-color: #2C566A;
+    border-radius: 100px;
+    width: 86%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+.progression .bar4{
+    position: absolute;
+    background-color: #2C566A;
+    border-radius: 100px;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+.upButton{
+    display: none;
+    position: fixed;
+    bottom: 13px;
+    right: 30px;
+    z-index: 50000;
+}
+.order-code .word{
+    display: inline-block;
+}
+.order-code .value{
+    font-size: 19px;
+    display: inline-block;
+}
+.items-table{
+    display: none;
+}
+.modal-content{
+    background-color: #2C566A;
+    text-align: center;
+}
+.rate-modal .modal-dialog{
+    padding-top: 5%;
+}
+.star{
+    display: inline-block;
+}
+.fa-star{
+    cursor: pointer;
+    color: #fff;
+}
+.rotate {
+    -moz-transition: all .5s linear;
+    -webkit-transition: all .5s linear;
+    transition: all .5s linear;
+}
+.rotate.up {
+    -moz-transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+    transform:rotate(180deg);
+}
+.footer-area {
+    background: #333333 none repeat scroll 0 0;
+    padding: 50px 0;
+    text-align: center;
+}
+.copy-right {
+    color: #ffffff;
+    margin: 0;
+}
+.copy-right a{
+    color: #ff305b;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+.copy-right a:hover{
+  text-decoration: none;
+}
+.footer-social-icon li {
+  display: inline-block;
+}
+.footer-social-icon li a {
+  color: #ffffff;
+  display: block;
+  height: 40px;
+  font-size: 18px;
+  line-height: 40px;
+  padding: 0 10px;
+}
+.footer-social-icon li a:hover {
+  color: #ff305b;
+}
