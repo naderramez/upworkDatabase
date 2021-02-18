@@ -192,7 +192,7 @@ router.post("/createjob", async (req, res) => {
         proposalsList: [],
         length: 0,
         hiringLength:0,
-        files:[]
+        proposalFiles:[]
       }
     });
     const savedJob = await job.save();
@@ -567,17 +567,21 @@ router.post('/uploadproposlsfiles', async (req, res)=>{
     await proposalUpload(req, res);
     console.log("files in controllers",proposalFiles);
     console.log("req.body",req.body);
-    if(req.files){
+    let count = 0;
       for(let i=0; i<req.files.length; i++){
         let read = fs.createReadStream(req.files[i].path)
         let buffer;
+        console.log("i before", i)
         read.on('data', async (data)=>{
           count++;
+          console.log("count", count)
+          console.log("i", i)
           if(count != i+1){
             return
           }
           theFiles = proposalFiles[i];
           buffer = data;
+          console.log("data:", data);
           const newFile = await {
             data:  buffer,
             fileName: theFiles,
@@ -586,7 +590,6 @@ router.post('/uploadproposlsfiles', async (req, res)=>{
           let file = new File(newFile)
           file.save();
         })
-      }
     }
     console.log(req.headers)
     let proposals = await Job.find(
