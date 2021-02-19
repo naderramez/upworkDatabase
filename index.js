@@ -32,7 +32,8 @@ app.use('/api/user',signin);
 app.use('/api/user', profile);
 app.use('/api/job',jobRoute);
 
-app.listen(8080);
+var PORT = process.env.PORT || 8080;
+app.listen(PORT);
 
 /*
 const jwt = require('jsonwebtoken')
