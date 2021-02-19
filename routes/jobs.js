@@ -109,19 +109,7 @@ router.post("/getonejob", async (req, res) => {
 router.get("/getclientjobs/:clientId", async (req, res) => {
   try {
     let jobs = await Job.find({ clientId: req.params.clientId }, {});
-    let sendedData = [];
-    for(let i = 0; i< jobs.length; i++){
-      let proposals = [];
-      for(let j =0; j < jobs[i].proposals.proposalsList.length; j++){
-        let user = await User.find({_id: jobs[i].proposals.proposalsList[j].userId});
-        proposals.push({...jobs[i].proposals.proposalsList[j], userFirstName: user[0].firstName, userLastName: user[0].lastName});
-        console.log("proposals", proposals)
-      }
-      let job = {...jobs[i]._doc, proposals:proposals}
-      console.log(job)
-      sendedData.push(job)
-    }
-    res.json(sendedData);
+    res.json(jobs);
   } catch (err) {
     res.json({ message: err.message });
   }
