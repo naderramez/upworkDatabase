@@ -32,7 +32,7 @@ app.use('/api/user',signin);
 app.use('/api/user', profile);
 app.use('/api/job',jobRoute);
 
-var PORT = process.env.PORT || 8080;
+const PORT = Process.env.PORT || 8080;
 app.listen(PORT);
 
 /*
