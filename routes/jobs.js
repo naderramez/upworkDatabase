@@ -696,7 +696,8 @@ router.post("/getproposals", async (req, res) => {
     for(let i = 0; i < proposals.length; i++) {
       console.log(proposals.proposalsList)
       let user = await User.findOne({_id: proposals.proposalsList[i].userId});
-      allProposals.push({...proposals, userFirstName: user.firstName, userLastName: user.lastName});
+      allProposals.push({...proposals.proposalsList[i], userFirstName: user.firstName, userLastName: user.lastName});
+      console.log(allProposals)
     }
     res.json(allProposals);
   } catch (err) {
