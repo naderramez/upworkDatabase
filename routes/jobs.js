@@ -688,14 +688,17 @@ router.post("/deleteproposals", async (req, res) => {
   }
 });
 //GET ALL PROPOSALS OF A SPECIFIC JOB
-router.post("/getproposals/:jobId", async (req, res) => {
+router.post("/getproposals", async (req, res) => {
   try {
-    let proposals = await Job.find(
-      { _id: req.body.jobId },
-      { proposals: 1, _id: 0 }
-    );
+    let proposals = await Job.find({ _id: req.body.jobId },{ proposals: 1, _id: 0 });
     proposals = proposals[0].proposals;
-    res.json(proposals);
+    let allProposals = [];
+    for(let i = 0; i < proposals.length; i++) {
+      console.log(proposals.proposalsList)
+      let user = await User.findOne({_id: proposals.proposalsList[i].userId});
+      allProposals.push({...proposals, userFirstName: user.firstName, userLastName: user.lastName});
+    }
+    res.json(allProposals);
   } catch (err) {
     res.json({ message: err.message });
   }
