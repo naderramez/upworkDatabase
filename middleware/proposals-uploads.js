@@ -6,7 +6,7 @@ const maxSize = 7 * 1024 * 1024 * 1024;
 let files = [];
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(`${__dirname}/../proposals-uploads`));
+    callback(null, path.join(`${__dirname}/`));
   },
   filename: (req, file, callback) => {
     const match = ["image/png", "image/jpeg","image/gif", "text/plain", "text/html", "text/javascript", "text/css","multipart/form-data", "multipart/byteranges", "application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.ms-powerpoint","application/zip","application/xml","application/typescript"];
