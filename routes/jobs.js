@@ -46,7 +46,7 @@ router.post("/getalljobs", async (req, res) => {
       allJobsData.push(j)
     }
     let sendedData = [];
-    for(let j = allJobsData.length-1;j > 0; j--){
+    for(let j = allJobsData.length-1;j >= 0; j--){
       sendedData.push(allJobsData[j]);
       
     }
